@@ -1,0 +1,143 @@
+{
+  "_about": [
+    "Everything that is built or checked in GHL's UI rather than the API. The checklist command renders these into out/ui-checklist.md with the client's values filled in, in this order, after the forms and workflows.",
+    "Source: spec/04-forms-pages.md, spec/06-affiliate-manager.md, spec/07-commissions-notifications.md, spec/08-testing-handover.md."
+  ],
+  "sections": [
+    {
+      "key": "access",
+      "title": "Access, before the build",
+      "spec": "08-testing-handover §8.1",
+      "steps": [
+        "The client adds ${people.builder_email} as a user of the sub-account (Settings -> My Staff). Seats in our own names, never a shared password.",
+        "Create a sub-account Private Integration token (Settings -> Private Integrations) with the scopes in CLIENT-CHECKLIST.md. An agency-level token fails with 'user type mismatch'.",
+        "The token goes into the .env file next to client.yaml as ${derived.token_env}=... . Never paste it into chat, Slack or a tracked file.",
+        "Location id: the id after /location/ in the sub-account's URL -> client.yaml ghl.location_id.",
+        "Run: preflight --live. Every person in client.yaml must show as a user of this sub-account. An agency owner can open the sub-account but is not a sub-account user (trap T11)."
+      ]
+    },
+    {
+      "key": "calendar_extras",
+      "title": "Calendar settings the build does not set",
+      "spec": "03-custom-values-calendar §3.2",
+      "steps": [
+        "Calendars -> ${derived.names.calendar} -> meeting location: ${derived.video_link_text}.",
+        "Daily maximum: ${derived.daily_max_text}.",
+        "Block the client's away dates now: ${derived.blocked_dates_text}. The booking window runs ${calendar.booking_window_days} days ahead, so dates a month out are already bookable.",
+        "Team member: at build time ${people.calendar_owner_email}. At handover it is the client's own user."
+      ]
+    },
+    {
+      "key": "funnel",
+      "title": "Partner pages (funnel)",
+      "spec": "04-forms-pages §4.4",
+      "steps": [
+        "Sites -> Funnels -> New funnel -> From blank: '${derived.names.funnel}'.",
+        "Step 'Become a Partner', path /become-a-partner: drag a 1 Column row onto the page, click its + Add, add Headline, Paragraph, then Forms And Surveys -> Add Existing Form -> ${derived.names.signup_form}. Save. Copy is DRAFT until the client approves it.",
+        "Domain: connect ${derived.domain_text} (Settings -> Domains). Ask the client which domain we can use and who can touch its DNS before writing any guide; a spare domain beats editing the main site.",
+        "Once the domain is verified: clone the step (Clone Funnel Step -> Clone step in this funnel), rename it 'Refer a Client', path /refer, swap its form to ${derived.names.refer_form} (form element -> Element Options), change the headline. Check with: curl ${derived.refer_url}",
+        "Publish the pages only when the domain is verified AND the client approved the copy."
+      ]
+    },
+    {
+      "key": "affiliate_manager",
+      "title": "Affiliate Manager",
+      "when": "affiliate_manager.enabled",
+      "spec": "06-affiliate-manager §6.1",
+      "steps": [
+        "Keep GHL visible on screen while doing this: a covered browser window stops GHL's dropdowns from responding.",
+        "Marketing -> Affiliate Manager -> Campaign -> Add. Name: ${derived.names.campaign}.",
+        "'Where your affiliate links lead': Forms -> ${derived.names.refer_form}. Keep it on Forms: switching to Funnels greys out 'Set Up Reward' until a product is attached, so a lead-only campaign cannot save.",
+        "Set Commission: Pay Per Lead with the per-lead amount OFF, unless the client pays per lead. Pay Per Sale is greyed out for a form campaign.",
+        "Assign Affiliate: none. Additional Settings: GHL's affiliate invite email ON (it is the partner's portal login), cookie life 365 days, payout terms as the client pays (${derived.payout_terms_text}).",
+        "Finish -> Publish now.",
+        "Refer a Client form: open the hidden Claimed Referral Code field (gear icon), set its Query Key to am_id. Save the form.",
+        "Without Stripe a Forms campaign tracks leads, not money: partners see their leads in the portal, not their earnings. The commission stays in the ${derived.names.referred} cycle. ${derived.stripe_text}"
+      ]
+    },
+    {
+      "key": "custom_values_check",
+      "title": "Custom values",
+      "spec": "03-custom-values-calendar §3.1",
+      "steps": [
+        "Settings -> Custom Values: check the five values the build wrote (Partner Page URL, Refer a Client URL, Partner Call Booking URL, Partner Commission Rate, Partner Program Owner). A value of a single space means 'not supplied yet'.",
+        "Emails and pages read these as {{custom_values.<key>}}, so a changed rate or URL is one edit."
+      ]
+    },
+    {
+      "key": "notifications_audit",
+      "title": "Notification audit (the client's own workflows too)",
+      "spec": "07-commissions-notifications §7.2",
+      "steps": [
+        "Open every PUBLISHED workflow in the account, including the client's older ones. Every Internal Notification step must go to Particular user(s), never 'All users'. GHL's templates default to All users, which emails our team every lead.",
+        "Change any you find to Particular user -> the client's team (${derived.alert_list} at build time). Ask before editing a client's own live workflow.",
+        "Settings pages save the last click late: wait about 6 seconds after the last change, reload in a new tab, and check every value."
+      ]
+    },
+    {
+      "key": "sms",
+      "title": "SMS and A2P (the client does this)",
+      "spec": "07-commissions-notifications §7.3",
+      "steps": [
+        "A2P 10DLC is per sub-account and is the client's own registration, in their business's name: Settings -> Phone Integration -> Trust Center -> A2P. It needs the EIN and the legal business details, and takes about 7-14 days. Start it on the first call.",
+        "Current status in client.yaml: ${sms.a2p_status}. SMS stays OFF in every workflow until it is approved.",
+        "Texts are transactional only (booking reminders, follow-ups) unless the client decides otherwise with us."
+      ]
+    },
+    {
+      "key": "email_sending",
+      "title": "Email sending",
+      "spec": "07-commissions-notifications §7.4",
+      "steps": [
+        "Sending domain: ${derived.sending_domain_text}. SPF, DKIM and DMARC set before any sending at scale.",
+        "From name and from email for any future partner email: ${derived.from_text}. A blank From sends from the location default: confirm it before anything goes live.",
+        "Cold email does not run from GHL. It runs from a sending rail (Instantly or similar) with its own domains and warmed inboxes."
+      ]
+    },
+    {
+      "key": "instantly",
+      "title": "Instantly -> GHL",
+      "when": "instantly.enabled",
+      "spec": "05-workflows §5.1",
+      "steps": [
+        "Use an Instantly automation, which works on any plan: Automations -> new, 'Interested lead -> GHL (${client.name})'. Trigger: Lead Interest Status Changed, status Interested, the client's campaigns. Action: HTTP Request, POST JSON to the trigger URL (instantly.webhook_url).",
+        "Body: lead_email, first_name, last_name, phone, company_name from the lead; campaign_name from the campaign label; event_type = lead_interested; reply_text and unibox_url as fixed text ('Marked Interested in Instantly. Open the Unibox to read the reply.').",
+        "Never push the client onto a bigger Instantly plan just for native webhooks. If they already have native webhooks: event 'Lead is marked as interested', same URL.",
+        "Check whether the workspace marks leads Interested automatically, and who handles the interested leads.",
+        "Test with a throwaway lead that has a phone number no other contact uses: GHL merges contacts by phone."
+      ]
+    },
+    {
+      "key": "views",
+      "title": "Views staff use every week",
+      "spec": "07-commissions-notifications §7.1",
+      "steps": [
+        "Opportunities -> ${derived.names.referred}: save a filter 'Rewards approved, not paid' (stage Commission Approved). The spec requires approved-but-unpaid rewards in one view.",
+        "Save a filter 'Attribution exceptions' (stage Attribution Review). There is no smart-list API, so views are made here."
+      ]
+    },
+    {
+      "key": "tests",
+      "title": "Tests, on @example.com contacts only",
+      "spec": "08-testing-handover §8.2",
+      "steps": [
+        "Public GHL forms carry Cloudflare's bot check. Never work around it. To test a form's workflow, write exactly what the form writes onto an @example.com contact, then enroll it in the workflow (POST /contacts/{id}/workflow/{workflowId}). Moving a deal's stage over the API fires stage-changed triggers like a drag does.",
+        "Give every test contact a phone number no other contact uses, or none.",
+        "Run: the Instantly test (if on), then tests 1-7 in spec/08-testing-handover.md §8.2. Check each result in GHL itself, not from a workflow's own report.",
+        "One real form fill by a person is still owed: 1 minute.",
+        "Cleanup, only with the account owner's go-ahead: save a JSON backup, delete test records by explicit id (never by pattern), then read the account back. Deletes are soft for 60 days."
+      ]
+    },
+    {
+      "key": "handover",
+      "title": "Handover",
+      "spec": "08-testing-handover §8.4",
+      "steps": [
+        "The client's own user is in every person slot: calendar team member, every notification, every task step. Update people.* in client.yaml and run verify --live.",
+        "Calendar rules agreed with the client: hours, daily maximum, video link, blocked dates.",
+        "Staff walked through the monthly commission (spec/07-commissions-notifications.md §7.1) and the conflict review (spec/05-workflows.md §5.2).",
+        "Every customer-facing piece is switched on by a human, one at a time: the funnel pages, any partner email, SMS."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# Secrets and client data never go in this repo.
+.env
+.env.*
+!.env.example
+client.yaml
+*.client.yaml
+out/
+*token*
+*Token*
+*TOKEN*
+*secret*
+*Secret*
+*SECRET*
+
+# Local noise
+node_modules/
+.DS_Store
+Thumbs.db
+*.log

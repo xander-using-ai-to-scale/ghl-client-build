@@ -1,0 +1,16 @@
+{
+  "name": "ghl-client-build",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Installs the Referral Partner Engine in a client's GoHighLevel sub-account: API build, UI checklist, verify.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "ghl-build": "bin/ghl-build.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}

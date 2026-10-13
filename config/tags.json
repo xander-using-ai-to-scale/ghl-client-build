@@ -1,0 +1,34 @@
+{
+  "_about": [
+    "Tags the build creates over the API. Source: spec/02-data-model.md §2.6.",
+    "GHL stores tags lowercase and trimmed, so they are written that way here.",
+    "${derived.segment_tags} expands to one segment/<name> tag per entry in program.segments."
+  ],
+  "tags": [
+    { "name": "source/instantly", "spec": "02-data-model §2.6" },
+    { "name": "source/linkedin-outflo", "spec": "02-data-model §2.6" },
+    { "name": "source/referral", "spec": "02-data-model §2.6" },
+    { "name": "source/manual", "spec": "02-data-model §2.6" },
+    { "name": "status/nurture", "spec": "02-data-model §2.6" },
+    { "name": "status/not-now", "spec": "02-data-model §2.6" },
+    { "name": "status/dnc", "spec": "02-data-model §2.6" },
+    { "name": "status/no-show", "spec": "02-data-model §2.6" },
+    { "name": "status/auto-responder", "spec": "02-data-model §2.6" },
+    { "name": "interest/partner-program", "spec": "02-data-model §2.6" },
+    { "name": "referral-partner", "spec": "02-data-model §2.6" },
+    { "name": "referred-lead", "spec": "02-data-model §2.6" },
+    { "name": "referral-attribution-pending", "spec": "02-data-model §2.6" },
+    { "name": "referral-attribution-conflict", "spec": "02-data-model §2.6" },
+    { "name": "referral-verified", "spec": "02-data-model §2.6" },
+    { "name": "commission-pending", "spec": "02-data-model §2.6" },
+    { "name": "commission-approved", "spec": "02-data-model §2.6" },
+    { "name": "commission-paid", "spec": "02-data-model §2.6" },
+    { "name": "needs-reply", "spec": "02-data-model §2.6" },
+    { "name": "appointment-booked", "spec": "02-data-model §2.6" },
+    { "name": "appointment-showed", "spec": "02-data-model §2.6" },
+    { "name": "sales-qualified", "spec": "02-data-model §2.6" },
+    { "name": "partner-onboarding", "spec": "02-data-model §2.6" },
+    { "name": "partner-needs-activation", "spec": "02-data-model §2.6" },
+    { "name": "${derived.segment_tags}", "spec": "02-data-model §2.6" }
+  ]
+}

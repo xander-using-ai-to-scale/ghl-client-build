@@ -1,0 +1,65 @@
+{
+  "_about": [
+    "The three forms. GHL has no tested API for building forms, so these are built in the UI from the checklist (out/ui-checklist.md); verify checks them by name over the API.",
+    "Source: spec/04-forms-pages.md. Forms write only to the 'Claimed ...' staging fields, never to the real credit fields (trap T12)."
+  ],
+  "forms": [
+    {
+      "key": "refer",
+      "name": "${derived.names.refer_form}",
+      "filledBy": "A partner, from their personal link",
+      "runs": "referral_capture",
+      "spec": "04-forms-pages §4.1",
+      "fields": [
+        { "label": "First name", "writes": "First Name (standard)" },
+        { "label": "Last name", "writes": "Last Name (standard)" },
+        { "label": "Email", "writes": "Email (standard)" },
+        { "label": "Phone", "writes": "Phone (standard)" },
+        { "label": "Company", "writes": "Company Name (standard)" },
+        { "label": "Tell us about this client", "writes": "Claim Notes" },
+        { "label": "Claimed Partner ID", "writes": "Claimed Partner ID", "hidden": true, "queryKey": "claimed_partner_id" },
+        { "label": "Claimed Partner Name", "writes": "Claimed Partner Name", "hidden": true, "queryKey": "claimed_partner_name" },
+        { "label": "Claimed Referral Code", "writes": "Claimed Referral Code", "hidden": true, "queryKey": "${derived.referral_code_query_key}" },
+        { "label": "Consent text", "writes": "(none)", "note": "Communication consent wording as the client's legal requirements say. Ask the client for it." }
+      ]
+    },
+    {
+      "key": "signup",
+      "name": "${derived.names.signup_form}",
+      "filledBy": "A new partner, on the Become a Partner page",
+      "runs": "partner_signup",
+      "spec": "04-forms-pages §4.2",
+      "fields": [
+        { "label": "First name", "writes": "First Name (standard)" },
+        { "label": "Last name", "writes": "Last Name (standard)" },
+        { "label": "Email", "writes": "Email (standard)" },
+        { "label": "Mobile phone", "writes": "Phone (standard)" },
+        { "label": "Business name", "writes": "Company Name (standard)" },
+        { "label": "Website", "writes": "Website (standard)" },
+        { "label": "Partner type", "writes": "Partner Type" },
+        { "label": "Partnership type", "writes": "Partnership Type" },
+        { "label": "Who you serve and why you are a fit", "writes": "Partner Notes" },
+        { "label": "How do you want to be paid?", "writes": "Payment Preference" },
+        { "label": "Terms acknowledgment", "writes": "(none)", "note": "Only if the client has partner terms (spec §11.1). The wording comes from the client." }
+      ]
+    },
+    {
+      "key": "staff",
+      "name": "${derived.names.staff_form}",
+      "filledBy": "Client staff only, after an email intro, a call or a walk-in. Never shared with partners",
+      "runs": "staff_attribution",
+      "spec": "04-forms-pages §4.3",
+      "fields": [
+        { "label": "First name", "writes": "First Name (standard)" },
+        { "label": "Last name", "writes": "Last Name (standard)" },
+        { "label": "Email", "writes": "Email (standard)" },
+        { "label": "Phone", "writes": "Phone (standard)" },
+        { "label": "Company", "writes": "Company Name (standard)" },
+        { "label": "Partner ID", "writes": "Claimed Partner ID" },
+        { "label": "Partner name", "writes": "Claimed Partner Name" },
+        { "label": "Partner referral code", "writes": "Claimed Referral Code" },
+        { "label": "How the referral came in (evidence)", "writes": "Claim Notes" }
+      ]
+    }
+  ]
+}

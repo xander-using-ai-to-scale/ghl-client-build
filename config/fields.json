@@ -1,0 +1,51 @@
+{
+  "_about": [
+    "Custom fields the build creates over the API. Source: spec/02-data-model.md.",
+    "dataType uses GHL's API names. GHL has no date-time field type, so dates are DATE.",
+    "${...} is filled from client.yaml (see lib/config.js). {{...}} is a GHL merge field and is left alone.",
+    "'when' drops the field unless the condition on client.yaml is true."
+  ],
+  "contact": [
+    { "name": "Instantly Campaign", "dataType": "TEXT", "when": "instantly.enabled", "spec": "02-data-model §2.1" },
+    { "name": "Partner Type", "dataType": "SINGLE_OPTIONS", "options": "${program.partner_types}", "spec": "02-data-model §2.1" },
+    { "name": "Partner Tier", "dataType": "SINGLE_OPTIONS", "options": "${derived.partner_tiers}", "spec": "02-data-model §2.1" },
+    { "name": "Partnership Type", "dataType": "SINGLE_OPTIONS", "options": ["Referral", "White Label"], "spec": "02-data-model §2.1" },
+    { "name": "Next Action Date", "dataType": "DATE", "spec": "02-data-model §2.1" },
+    { "name": "Lost Reason", "dataType": "SINGLE_OPTIONS", "options": ["No fit", "Not interested", "No response", "Bad timing", "Do not contact"], "spec": "02-data-model §2.1" },
+    { "name": "Affiliate Link", "dataType": "TEXT", "spec": "02-data-model §2.1" },
+    { "name": "Agreement Signed Date", "dataType": "DATE", "spec": "02-data-model §2.1" },
+    { "name": "Referrals Sent", "dataType": "NUMERICAL", "spec": "02-data-model §2.1" },
+    { "name": "Last Referral Date", "dataType": "DATE", "spec": "02-data-model §2.1" },
+
+    { "name": "Contact Role", "dataType": "SINGLE_OPTIONS", "options": ["Referral Partner", "Referred Lead", "Client Staff", "Other"], "spec": "02-data-model §2.2" },
+    { "name": "Partner ID", "dataType": "TEXT", "spec": "02-data-model §2.2" },
+    { "name": "Referral Code", "dataType": "TEXT", "spec": "02-data-model §2.2" },
+    { "name": "Reward Model", "dataType": "SINGLE_OPTIONS", "options": ["Per Lead", "Per Show", "Per Qualified Consult", "Per Sale", "Revenue Share", "Custom / Non-Cash"], "spec": "02-data-model §2.2" },
+    { "name": "Revenue Share Percent", "dataType": "NUMERICAL", "spec": "02-data-model §2.2" },
+    { "name": "Payment Preference", "dataType": "SINGLE_OPTIONS", "options": "${derived.payment_methods}", "spec": "02-data-model §2.2" },
+
+    { "name": "Referral Source Type", "dataType": "SINGLE_OPTIONS", "options": ["Partner", "Friend / Family", "Existing Client", "Employee", "Event", "Other"], "spec": "02-data-model §2.3" },
+    { "name": "Referring Partner Name", "dataType": "TEXT", "spec": "02-data-model §2.3" },
+    { "name": "Referring Partner ID", "dataType": "TEXT", "spec": "02-data-model §2.3" },
+    { "name": "Referral Attribution Method", "dataType": "SINGLE_OPTIONS", "options": ["Referral Link", "QR Code", "Partner Submission", "Email Introduction", "Dedicated Phone", "Dedicated SMS", "Booking Form", "Intake Form", "Self-Reported", "Staff Entered", "AI Suggested", "Other"], "spec": "02-data-model §2.3" },
+    { "name": "Attribution Confidence", "dataType": "SINGLE_OPTIONS", "options": ["Verified", "Claimed", "Pending Verification", "Conflicting", "Rejected"], "spec": "02-data-model §2.3" },
+    { "name": "Referral Date", "dataType": "DATE", "spec": "02-data-model §2.3" },
+    { "name": "Referral Evidence", "dataType": "LARGE_TEXT", "spec": "02-data-model §2.3" },
+    { "name": "Attribution Lock", "dataType": "SINGLE_OPTIONS", "options": ["Unlocked", "Locked"], "spec": "02-data-model §2.3" },
+
+    { "name": "Claimed Partner ID", "dataType": "TEXT", "spec": "02-data-model §2.4" },
+    { "name": "Claimed Partner Name", "dataType": "TEXT", "spec": "02-data-model §2.4" },
+    { "name": "Claimed Referral Code", "dataType": "TEXT", "spec": "02-data-model §2.4" },
+    { "name": "Claim Notes", "dataType": "LARGE_TEXT", "spec": "02-data-model §2.4" },
+    { "name": "Partner Notes", "dataType": "LARGE_TEXT", "spec": "02-data-model §2.4" }
+  ],
+  "opportunity": [
+    { "name": "Client Monthly Revenue", "dataType": "MONETORY", "spec": "02-data-model §2.5" },
+    { "name": "Reward Amount", "dataType": "MONETORY", "spec": "02-data-model §2.5" },
+    { "name": "Commission Status", "dataType": "SINGLE_OPTIONS", "options": ["Not Eligible", "Pending", "Approved", "Paid", "Rejected", "Disputed"], "spec": "02-data-model §2.5" },
+    { "name": "Sale Date", "dataType": "DATE", "spec": "02-data-model §2.5" },
+    { "name": "Commission Approval Date", "dataType": "DATE", "spec": "02-data-model §2.5" },
+    { "name": "Last Commission Payment Date", "dataType": "DATE", "spec": "02-data-model §2.5" },
+    { "name": "Commission Payments Made", "dataType": "NUMERICAL", "spec": "02-data-model §2.5" }
+  ]
+}

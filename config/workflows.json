@@ -1,0 +1,165 @@
+{
+  "_about": [
+    "The workflows. GHL's API lists workflows but cannot create or edit them (404), so each one is built in the UI from the steps below. The checklist command prints them with every value filled in; verify checks each one by name and reports its status.",
+    "Source: spec/05-workflows.md. A step is a string, or { when, text } for a step that only applies to some clients.",
+    "customer_facing: true means the workflow can make something reach a person outside the client's team. It stays Draft until a human switches it on."
+  ],
+  "rulesForAll": [
+    "Every Internal Notification goes to Particular user(s): ${derived.alert_list}. Never 'All users': GHL's default emails every user in the sub-account, our team included (trap T10).",
+    "Every task goes to one person: ${people.task_assignee_email}. GHL's task assignee is single-select; two people need two task steps.",
+    "No partner- or client-facing emails or texts in v1. Their copy needs the client's approval first and is marked DRAFT.",
+    "Deals are named {{contact.email}}. Instantly often sends no names, and Find opportunity matches on the name.",
+    "To move an existing deal from a form- or contact-triggered workflow, use Find opportunity (pipeline + Opportunity Name = {{contact.email}}), then Update opportunity. 'Create opportunity' never updates an existing deal (trap T14).",
+    "Click the header Save every few edits. The builder wedges after about 20 edits and a reload drops unsaved work (trap T16).",
+    "The truth is the API, not the canvas: run 'verify --live' after each workflow (name, status, version)."
+  ],
+  "workflows": [
+    {
+      "key": "instantly_reply",
+      "name": "${derived.prefix}Instantly - Interested Partner Reply",
+      "when": "instantly.enabled",
+      "customer_facing": false,
+      "spec": "05-workflows §5.1",
+      "trigger": "Inbound Webhook, named 'Instantly - lead marked interested'. Copy its URL into client.yaml (instantly.webhook_url). The trigger needs one sample request before it saves: POST a sample payload with an @example.com email and a phone no other contact uses, then click 'Fetch sample requests'.",
+      "settings": ["Allow re-entry: on (every reply gets its own note and task)", "This trigger is a GHL premium trigger: a small charge per run"],
+      "steps": [
+        "Create contact: Email <- lead_email; First name <- first_name; Last name <- last_name; Phone <- phone; Business name <- company_name. If a key is not in the sample yet, type it: {{inboundWebhookRequest.lead_email}} (an orange token is valid).",
+        "Update contact field: Instantly Campaign <- campaign_name; Next Action Date <- today (Dynamic -> Right now -> Date).",
+        "Add tag: source/instantly, interest/partner-program.",
+        "Create opportunity: pipeline ${derived.names.recruiting}, stage Engaged, name {{contact.email}}, source 'Instantly reply', allow duplicates OFF.",
+        "Add note: the reply text (reply_text), the campaign, and the Unibox link (unibox_url).",
+        "Internal notification (Email, Particular user: ${derived.alert_list}): subject 'New interested partner reply - act today: {{contact.email}}'; body with name, company, campaign, reply and Unibox link.",
+        "Add task: 'Reply to {{contact.email}} - interested partner', assigned to ${people.task_assignee_email}, due next day, skip weekends."
+      ],
+      "test": "Instantly test: POST a sample twice with the same @example.com email. Expect one contact, one deal at Engaged, two notes, two tasks."
+    },
+    {
+      "key": "referral_capture",
+      "name": "${derived.prefix}Referral Engine - Referral Capture",
+      "customer_facing": false,
+      "spec": "05-workflows §5.2",
+      "trigger": "Form submitted: ${derived.names.refer_form}",
+      "settings": [],
+      "steps": [
+        "Update contact field: Contact Role -> Referred Lead. Add tag: referred-lead.",
+        "If / else 'First claim?': Referring Partner ID is empty -> First claim branch; otherwise -> Later claim branch. (Search 'Else' to find it. Inserted mid-chain it puts the following steps in the FIRST branch: check before saving.)",
+        "First claim, 'Record first claim': Referring Partner ID <- {{contact.claimed_partner_id}}; Referring Partner Name <- {{contact.claimed_partner_name}}; Referral Code <- {{contact.claimed_referral_code}}; Referral Attribution Method -> Partner Submission; Attribution Confidence -> Claimed; Referral Source Type -> Partner; Referral Date -> today; Referral Evidence <- {{contact.claim_notes}}.",
+        { "when": "affiliate_manager.enabled", "text": "First claim, 'File the lead under its partner': Add leads under an affiliate, Custom Mapping, AM ID <- the contact's Referral Code (Contact -> Custom Fields -> Referral Code). No campaign picker in this mode: the am_id names the campaign." },
+        "First claim: Create opportunity in ${derived.names.referred} at Referral Received, name {{contact.email}}, source 'Partner referral'.",
+        "First claim: Add task 'Contact referred lead {{contact.email}} from partner {{contact.referring_partner_name}}', to ${people.task_assignee_email}, due in 1 business day.",
+        "Later claim: overwrite nothing. Add tag referral-attribution-conflict; Attribution Confidence -> Conflicting.",
+        "Later claim: Find opportunity (pipeline ${derived.names.referred}, Opportunity Name = {{contact.email}}), then Update opportunity -> stage Attribution Review.",
+        "Later claim: Add task 'Review attribution conflict: {{contact.email}}', to ${people.commission_approver_email}."
+      ],
+      "test": "Tests 1 and 2: a first claim gets the credit; a second claim on the same client goes to Attribution Review and the first partner keeps the credit."
+    },
+    {
+      "key": "staff_attribution",
+      "name": "${derived.prefix}Referral Engine - Staff Attribution",
+      "customer_facing": false,
+      "spec": "05-workflows §5.3",
+      "trigger": "Form submitted: ${derived.names.staff_form}",
+      "settings": [],
+      "steps": [
+        "Same steps as Referral Capture, with Referral Attribution Method -> Staff Entered.",
+        "Quickest route: duplicate Referral Capture, change the trigger form and the method. Duplicating turns the dropdown values in Update-opportunity steps into free text: delete those rows and add them again (trap T15)."
+      ],
+      "test": "Test 3: a staff-logged intro gives the partner the credit with method Staff Entered."
+    },
+    {
+      "key": "partner_signup",
+      "name": "${derived.prefix}Referral Engine - Partner Sign-Up",
+      "customer_facing": true,
+      "customerFacingWhy": "With the Affiliate Manager on, adding the partner to the campaign sends GHL's affiliate invite email (the partner's portal login).",
+      "spec": "05-workflows §5.4",
+      "trigger": "Form submitted: ${derived.names.signup_form}",
+      "settings": [],
+      "steps": [
+        "Update contact field: Contact Role -> Referral Partner; Partner ID <- {{contact.id}}.",
+        "Update contact field: Reward Model -> ${program.reward_model}; Revenue Share Percent -> ${program.commission_rate_percent}.",
+        "Update contact field: Affiliate Link <- ${derived.refer_link_template}",
+        "Add tag: referral-partner, partner-onboarding.",
+        "Create opportunity in ${derived.names.lifecycle} at Onboarding, name {{contact.email}}, source 'Partner sign-up form'.",
+        "Add task: 'Onboard new referral partner: {{contact.email}}', to ${people.task_assignee_email}.",
+        { "when": "affiliate_manager.enabled", "text": "Add to affiliate manager." },
+        { "when": "affiliate_manager.enabled", "text": "Add to affiliate campaign -> ${derived.names.campaign}." }
+      ],
+      "test": "Test 4: partner fields, the rate, the personal link, both tags, the Onboarding deal and the task. Test 6 (Affiliate Manager on): the partner appears under the campaign."
+    },
+    {
+      "key": "affiliate_link",
+      "name": "${derived.prefix}Referral Engine - Affiliate Link",
+      "when": "affiliate_manager.enabled",
+      "customer_facing": false,
+      "spec": "05-workflows §5.5",
+      "trigger": "Affiliate enrolled in campaign, filter Campaign is ${derived.names.campaign}",
+      "settings": [],
+      "steps": [
+        "Update contact field: Affiliate Link <- {{Affiliate enrolled in campaign.Affiliate Referral Link}}&claimed_partner_id={{contact.id}}&claimed_partner_name={{contact.first_name}}%20{{contact.last_name}}. Insert the first token from the picker (search 'affiliate'), then type the rest after it.",
+        "Update contact field: Referral Code <- {{Affiliate enrolled in campaign.Am Id}} (search 'am id' in the picker).",
+        "Publish. It overwrites the link Partner Sign-Up wrote first, which has no am_id."
+      ],
+      "test": "Test 6: Affiliate Link is GHL's link with am_id plus our Partner ID and name; Referral Code holds the am_id."
+    },
+    {
+      "key": "commission_sale",
+      "name": "${derived.prefix}Referral Engine - Commission 1: Sale",
+      "customer_facing": false,
+      "spec": "05-workflows §5.6",
+      "trigger": "Pipeline stage changed: ${derived.names.referred} -> Sold / Enrolled",
+      "settings": [],
+      "steps": [
+        "Update opportunity field: Sale Date -> today; Commission Status -> Pending.",
+        "Update opportunity: stage -> Commission Pending.",
+        "Update contact field: Attribution Lock -> Locked.",
+        "Add task: 'Approve partner commission: {{contact.email}}', to ${people.commission_approver_email}."
+      ],
+      "test": "Test 5, part 1: Sold moves on to Commission Pending with the sale date, Pending, the lock and the approval task."
+    },
+    {
+      "key": "commission_approved",
+      "name": "${derived.prefix}Referral Engine - Commission 2: Approved",
+      "customer_facing": false,
+      "spec": "05-workflows §5.7",
+      "trigger": "Pipeline stage changed: ${derived.names.referred} -> Commission Approved",
+      "settings": [],
+      "steps": [
+        "Update opportunity field: Commission Status -> Approved; Commission Approval Date -> today.",
+        "Add task: 'Pay partner commission for {{contact.email}}', to ${people.task_assignee_email}."
+      ],
+      "test": "Test 5, part 2: Approved adds the date and the payout task."
+    },
+    {
+      "key": "commission_paid",
+      "name": "${derived.prefix}Referral Engine - Commission 3: Paid, monthly repeat",
+      "when": "program.commission_mode == recurring_monthly",
+      "customer_facing": false,
+      "spec": "05-workflows §5.8",
+      "trigger": "Pipeline stage changed: ${derived.names.referred} -> Commission Paid",
+      "settings": [],
+      "steps": [
+        "Update opportunity field: Commission Status -> Paid; Last Commission Payment Date -> today.",
+        "Wait 30 days (wait units stop at days).",
+        "If / else: is the deal still at Commission Paid?",
+        "Yes: Update opportunity -> stage Commission Pending (turn on 'allow previous stage'); Commission Status -> Pending; Add task 'Monthly partner commission due: {{contact.email}}', to ${people.commission_approver_email}.",
+        "No (the client was moved to Lost / No Sale): END. The cycle stops.",
+        "No commission tags in this loop: they would pile up every month. The state lives on the deal (stage + Commission Status)."
+      ],
+      "test": "Test 5, part 3 and the monthly loop: set the wait to 1 minute, publish, test, move a second deal to Lost / No Sale during the wait, then set the wait back to 30 days and click the header Save."
+    },
+    {
+      "key": "commission_paid_once",
+      "name": "${derived.prefix}Referral Engine - Commission 3: Paid",
+      "when": "program.commission_mode == one_time",
+      "customer_facing": false,
+      "spec": "05-workflows §5.9",
+      "trigger": "Pipeline stage changed: ${derived.names.referred} -> Commission Paid",
+      "settings": [],
+      "steps": [
+        "Update opportunity field: Commission Status -> Paid; Last Commission Payment Date -> today.",
+        "END. One payout: no wait and no loop."
+      ],
+      "test": "Test 5, part 3: Paid adds the payment date and the cycle ends."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "_about": [
+    "Pipelines the build creates over the API. Source: spec/01-pipelines.md.",
+    "Won / Lost / Abandoned are GHL's opportunity status, not stages.",
+    "The key is how workflows and the checklist refer to a pipeline; the name gets the client's naming prefix."
+  ],
+  "pipelines": [
+    {
+      "key": "recruiting",
+      "name": "${derived.prefix}Partner Recruiting",
+      "stages": ["New", "Working", "Engaged", "Booked", "Showed", "Offer Made"],
+      "spec": "01-pipelines §1.1"
+    },
+    {
+      "key": "lifecycle",
+      "name": "${derived.prefix}Partner Lifecycle",
+      "stages": ["Signed", "Onboarding", "Activated", "Producing", "Dormant"],
+      "spec": "01-pipelines §1.2"
+    },
+    {
+      "key": "referred",
+      "name": "${derived.prefix}Referred Leads",
+      "stages": [
+        "Referral Received", "Attempting Contact", "Contacted / Nurture", "Appointment Booked", "Appointment Showed",
+        "Qualified / Consult Completed", "Sold / Enrolled", "Commission Pending", "Commission Approved", "Commission Paid",
+        "No Show / Unqualified", "Lost / No Sale", "Attribution Review"
+      ],
+      "spec": "01-pipelines §1.3"
+    }
+  ]
+}

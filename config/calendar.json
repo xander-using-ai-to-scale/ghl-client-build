@@ -1,0 +1,43 @@
+{
+  "_about": [
+    "The Partner Intro Call calendar, created over the API. Source: spec/03-custom-values-calendar.md §3.2.",
+    "Keys are GHL's calendar API names, including its own spelling 'appoinmentPerSlot'.",
+    "managedKeys are the settings build --repair compares and fixes. Every update sends the FULL saved calendar with these keys laid on top, because a PUT carrying only openHours resets slotDuration (trap T6)."
+  ],
+  "calendar": {
+    "name": "${derived.names.calendar}",
+    "description": "${calendar.description}",
+    "calendarType": "round_robin",
+    "widgetType": "classic",
+    "widgetSlug": "${calendar.slug}",
+    "slug": "${calendar.slug}",
+    "eventTitle": "${calendar.name} - {{contact.name}}",
+    "eventColor": "#039be5",
+    "slotDuration": "${calendar.duration_minutes}",
+    "slotDurationUnit": "mins",
+    "slotInterval": "${derived.slot_interval}",
+    "slotIntervalUnit": "mins",
+    "slotBuffer": "${calendar.buffer_minutes}",
+    "slotBufferUnit": "mins",
+    "appoinmentPerSlot": 1,
+    "allowBookingAfter": "${calendar.min_notice_hours}",
+    "allowBookingAfterUnit": "hours",
+    "allowBookingFor": "${calendar.booking_window_days}",
+    "allowBookingForUnit": "days",
+    "openHours": "${derived.open_hours}",
+    "enableRecurring": false,
+    "autoConfirm": true,
+    "allowReschedule": true,
+    "allowCancellation": true,
+    "isActive": true,
+    "formSubmitType": "ThankYouMessage",
+    "formSubmitThanksMessage": "${derived.confirmation_text}",
+    "spec": "03-custom-values-calendar §3.2"
+  },
+  "managedKeys": [
+    "slotDuration", "slotDurationUnit", "slotInterval", "slotIntervalUnit", "slotBuffer", "slotBufferUnit",
+    "allowBookingAfter", "allowBookingAfterUnit", "allowBookingFor", "allowBookingForUnit",
+    "openHours", "autoConfirm", "formSubmitType", "formSubmitThanksMessage"
+  ],
+  "alwaysSendKeys": ["slotDuration", "slotDurationUnit", "slotInterval", "slotIntervalUnit", "slotBuffer", "slotBufferUnit", "openHours"]
+}

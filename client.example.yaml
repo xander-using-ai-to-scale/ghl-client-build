@@ -1,0 +1,114 @@
+# client.yaml: everything the build needs to know about ONE client.
+#
+# Copy this file into the client's folder as client.yaml, then fill it in.
+# The values below are for a made-up client, Summit Ridge Roofing. Replace all of them.
+#
+# NEVER put a token or a password in this file. The GHL token goes in a file named .env
+# next to client.yaml, on one line:  GHL_TOKEN=<the token>
+#
+# Each field says which stage it blocks if it is empty:
+#   [live]       any --live run          [build]   the API build
+#   [checklist]  the UI build            [go-live] switching anything customer-facing on
+# `preflight` lists every gap. Format: plain "key: value" lines, "- item" lists, [a, b] lists.
+
+client:
+  name: Summit Ridge Roofing                 # [build] business name, as partners see it
+  slug: summit-ridge-roofing                 # [build] lowercase-with-dashes, used in file names
+  website: https://summitridgeroofing.example
+  timezone: America/Denver                   # [build] IANA name; must match the sub-account's time zone
+  industry: Roofing
+
+ghl:
+  platform: ghl                              # [build] ghl | other. "other" = stop after the checklist
+  location_id: ""                            # [live] the id after /location/ in the sub-account's URL
+  token_env: GHL_TOKEN                       # the variable in .env that holds the token
+  token_file: ""                             # optional instead of .env: a file outside any repo
+  account_type: sub-account                  # sub-account | agency: what the client owns
+
+naming:
+  prefix: ""                                 # "" in a fresh account. In an account already in use, a
+                                             # prefix like "RPE | " keeps our objects apart from theirs
+
+people:
+  # Every person here must be a USER of the sub-account (preflight --live checks it).
+  # An agency owner is not a sub-account user. Until handover, these are our builder.
+  builder_email: builder@agency.example              # [build] our user in the sub-account
+  calendar_owner_email: builder@agency.example       # [build] the calendar's team member
+  alert_emails: [builder@agency.example]             # [checklist] new-lead alerts (Particular users)
+  task_assignee_email: builder@agency.example        # [checklist] follow-up tasks (one person)
+  commission_approver_email: builder@agency.example  # [checklist] approves commissions (one person)
+  interested_leads_handled_by: owner                 # [checklist] owner | assistant | agent
+  program_owner_name: Dana Example                   # [go-live] shown to partners
+
+program:
+  name: Summit Ridge Roofing Partner Program # [build] funnel and Affiliate Manager campaign name
+  partner_types: [Realtor, Home Inspector, Insurance Agent, Property Manager, General Contractor, Other]   # [build]
+  segments: [realtor, home-inspector, insurance-agent, property-manager, general-contractor, other]     # [checklist] segment/<name> tags
+  partner_tiers: []                          # empty = Tier 1, Tier 2, Tier 3
+  reward_model: Revenue Share                # [build] Per Lead | Per Show | Per Qualified Consult | Per Sale | Revenue Share | Custom / Non-Cash
+  commission_mode: recurring_monthly         # [build] recurring_monthly (every month while the client pays) | one_time (one payout)
+  commission_rate_percent: 10                # [build] dummy value. The real rate comes from the client
+  commission_label: ""                       # optional wording for the custom value; empty = "<rate>%"
+  payment_methods: []                        # empty = ACH, Check, PayPal, Gift Card, Service Credit, Other
+  payout_terms: Net-15                       # [checklist]
+  has_partner_terms: false                   # true = add a terms checkbox to the sign-up form
+
+calendar:
+  name: Partner Intro Call                   # [build]
+  slug: summit-ridge-partner-intro-call      # [build] booking link slug
+  description: A 20-minute intro call with a prospective referral partner.   # [build]
+  duration_minutes: 20                       # [build]
+  buffer_minutes: 10                         # [build]
+  interval_minutes: 30
+  min_notice_hours: 2                        # [build]
+  booking_window_days: 30                    # [build]
+  daily_max: 0                               # 0 = no cap (set in the UI)
+  video_link: ""                             # [go-live] Zoom, Meet or GHL video
+  confirmation_text: ""                      # empty = a plain default; GHL's own default text is wrong with auto-confirm
+  blocked_dates: []                          # e.g. ["2026-11-09 to 2026-11-22"]; block them as soon as they are known
+  hours:                                     # [build] in the client's time zone
+    - days: [mon, tue, wed, thu, fri]
+      open: "10:00"
+      close: "17:00"
+
+domain:
+  partner_domain: ""                         # [go-live] e.g. partners.summitridgeroofing.example
+  dns_contact: ""                            # [go-live] who can change the DNS
+  verified: false
+
+email_sending:
+  sending_domain: ""
+  from_name: ""
+  from_email: ""                             # [go-live]
+  authenticated: false                       # [go-live] true once SPF, DKIM and DMARC are set
+
+sms:
+  a2p_status: not_started                    # [go-live] not_started | submitted | approved | not_needed. SMS stays off until approved
+
+stripe:
+  connected: false                           # not needed: commissions run without Stripe
+
+affiliate_manager:
+  enabled: true                              # GHL's Affiliate Manager: partner portal, links, leads per partner
+
+instantly:
+  enabled: false                             # true if the client's cold email runs in Instantly
+  workspace_access: false                    # [checklist, if enabled]
+  webhook_url: ""                            # [go-live, if enabled] the GHL trigger URL, after the workflow is built
+
+customize:
+  # Changes to the standard build for this client. Same name replaces; a new name adds.
+  remove:
+    fields: []                               # field names
+    tags: []
+    pipelines: []                            # recruiting | lifecycle | referred
+    workflows: []                            # e.g. instantly_reply
+    forms: []                                # refer | signup | staff
+  add:
+    contact_fields: []                       # - name: Roof Type
+                                             #   dataType: SINGLE_OPTIONS
+                                             #   options: [Shingle, Metal, Flat]
+    opportunity_fields: []
+    tags: []
+    pipelines: []                            # - name: Referred Jobs
+                                             #   stages: [Referral Received, Inspected, Quoted, Won]

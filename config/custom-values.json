@@ -1,0 +1,14 @@
+{
+  "_about": [
+    "Custom values the build creates over the API, so emails and pages read every changeable fact from one place.",
+    "Source: spec/03-custom-values-calendar.md §3.1.",
+    "'@booking_url' is filled at build time from the calendar's id. A blank value is stored as a single space, because GHL keeps no empty custom value (trap T9)."
+  ],
+  "customValues": [
+    { "name": "Partner Page URL", "value": "${derived.partner_page_url}", "spec": "03-custom-values-calendar §3.1" },
+    { "name": "Refer a Client URL", "value": "${derived.refer_url}", "spec": "03-custom-values-calendar §3.1" },
+    { "name": "Partner Call Booking URL", "value": "@booking_url", "spec": "03-custom-values-calendar §3.1" },
+    { "name": "Partner Commission Rate", "value": "${derived.commission_label}", "spec": "03-custom-values-calendar §3.1" },
+    { "name": "Partner Program Owner", "value": "${people.program_owner_name}", "spec": "03-custom-values-calendar §3.1" }
+  ]
+}
