@@ -67,6 +67,18 @@ test('cli: build without --live makes no network call and writes a run log', asy
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
+test('cli: build --check without --live says so and stays a dry run', async () => {
+  const dir = clientDir();
+  let calls = 0;
+  const out = [];
+  const code = await main(['build', '--check'], { cwd: dir, env: {}, fetchImpl: () => { calls++; throw new Error('network'); }, stdout: (s) => out.push(s), stderr: (s) => out.push(s) });
+  const text = out.join(' | ');
+  assert.equal(code, 0, text);
+  assert.equal(calls, 0);
+  assert.match(text, /--check needs --live/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 test('cli: preflight, build --live twice, verify --live against the fake; the token never reaches a file', async () => {
   const dir = clientDir();
   fs.writeFileSync(path.join(dir, '.env'), 'GHL_TOKEN=test-secret-value-123\n');

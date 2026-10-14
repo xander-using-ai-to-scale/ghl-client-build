@@ -136,7 +136,8 @@
         "The client's own user is in every person slot: calendar team member, every notification, every task step. Update people.* in client.yaml and run verify --live.",
         "Calendar rules agreed with the client: hours, daily maximum, video link, blocked dates.",
         "Staff walked through the monthly commission (spec/07-commissions-notifications.md §7.1) and the conflict review (spec/05-workflows.md §5.2).",
-        "Every customer-facing piece is switched on by a human, one at a time: the funnel pages, any partner email, SMS."
+        "Every customer-facing piece is switched on by a human, one at a time: the funnel pages, any partner email, SMS.",
+        "Rotate the Private Integration token at handover: the client deletes ours or makes a new one."
       ]
     }
   ]

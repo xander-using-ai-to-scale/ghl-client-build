@@ -11,7 +11,7 @@ Each item says which stage it blocks:
 
 - [ ] **[live]** Which GHL they own: the whole agency, or one sub-account. Which sub-account the program goes in.
 - [ ] **[live]** Our builder added as a **user of that sub-account** (Settings -> My Staff). A seat in our name, never a shared login.
-- [ ] **[live]** A **sub-account Private Integration token** (Settings -> Private Integrations, inside the sub-account; an agency token does not work). Made together on a call, or sent by a one-time secure link. It goes in `.env`, never in Slack, email or chat. Scopes:
+- [ ] **[live]** A **sub-account Private Integration token** (Settings -> Private Integrations, inside the sub-account; an agency token does not work). Made together on a call, or sent by a one-time secure link. Sent privately (a DM or a one-time link), never in a shared channel. It goes in `.env`, never in Slack, email or chat. Scopes:
   - Edit (includes view): Contacts, Opportunities, Custom Fields, Custom Values, Tags, Calendars
   - View: Users, Workflows, Locations, Forms
 - [ ] **[build]** The person who will own the program inside GHL (the calendar, the alerts, the tasks) **is a user of the sub-account**. An agency owner is not, until they add themselves as a user.
@@ -24,6 +24,10 @@ Each item says which stage it blocks:
 - [ ] **[go-live]** A2P status for texting. The client registers it in their own GHL (Settings -> Phone Integration -> Trust Center -> A2P) with their EIN and legal business details; it takes about 7-14 days. Start it now. SMS stays off until it is approved.
 - [ ] Optional: Stripe connected. Not needed: commissions are tracked without it. Only needed to show earnings in the partner portal.
 - [ ] **[checklist]** If their cold email runs in Instantly: access to the workspace. No plan upgrade is needed.
+- [ ] Cold email in general: which sending tool (rail) they use, and who owns the sending inboxes and their warm-up. Cold email never runs from GHL.
+- [ ] Whether there is a build spec written for this client, and access to every template it points at.
+- [ ] Their own plan, if they sent one, mapped against the scope they signed. What is in and out is agreed in writing before the build.
+- [ ] If the client also gets AI agents (for example on Orgo): send our agent install checklist too. The agents are outside this build.
 
 ### People
 
@@ -34,7 +38,7 @@ Each item says which stage it blocks:
 
 ## On the call
 
-- [ ] **[build]** Partner types (the dropdown options), and the segments for tags.
+- [ ] **[build]** Partner types (the dropdown options), partner tiers (default Tier 1, 2, 3), and the segments for tags.
 - [ ] **[build]** The reward model and the rate: per lead, per sale, revenue share, or a custom reward. Whether it is paid **every month** while the customer pays, or **once**.
 - [ ] **[checklist]** Payout terms and how partners get paid (ACH, check, PayPal, gift card...). Any compliance limit on paying referral fees.
 - [ ] **[build]** Calendar rules for partner calls: days and hours, call length, buffer, notice, how far ahead.
@@ -50,6 +54,7 @@ Each item says which stage it blocks:
 - [ ] **[go-live]** Their approval before any partner email or text goes on.
 - [ ] Their own GHL user takes every person slot at handover (calendar, alerts, tasks).
 - [ ] A real form fill by a person, once, to close the tests (1 minute).
+- [ ] Rotate the Private Integration token at handover: the client deletes ours or makes a new one.
 
 ## Intake questions Claude can ask
 
@@ -60,7 +65,7 @@ Ask a few at a time, starting with what blocks the build. Fill from the client's
 3. Who will own the program in GHL day to day, and are they a user of that sub-account?
 4. Who handles interested partners and referred leads: you, an assistant, or an agent?
 5. Who should get the new-lead alerts, who gets the follow-up tasks, and who approves commissions?
-6. What kinds of businesses or people will refer to you? (These become the Partner Type options.)
+6. What kinds of businesses or people will refer to you? (These become the Partner Type options.) Do you rank partners in tiers?
 7. How are partners rewarded: per lead, per sale, a share of revenue, or something else? What rate?
 8. Is the reward paid every month while the customer stays, or once?
 9. How and when are partners paid (ACH, check, PayPal...)? Any limits on paying referral fees in your industry?
@@ -69,5 +74,5 @@ Ask a few at a time, starting with what blocks the build. Fill from the client's
 12. Which domain can we use for the partner pages, and who can change its DNS?
 13. Which address should partner emails come from? Is that domain authenticated (SPF, DKIM, DMARC)?
 14. Have you registered for business texting (A2P) in GHL? If not, can you start it this week?
-15. Do you run cold email in Instantly? If yes, can you share the workspace with us?
+15. Which tool sends your cold email, and who owns the sending inboxes? If it is Instantly, can you share the workspace with us?
 16. Is anything already in your GHL that we must leave alone?

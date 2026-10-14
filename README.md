@@ -6,8 +6,8 @@ Installs our Referral Partner Engine in a client's GoHighLevel sub-account: part
 
 | Automatic (API) | By hand, from a generated checklist (GHL has no API for these) |
 |---|---|
-| 29 contact fields, 7 deal fields, the tags | 3 forms: Refer a Client, Partner Sign-Up, Staff Attribution |
-| 3 pipelines: Partner Recruiting, Partner Lifecycle, Referred Leads | 8 workflows (exact steps, with the client's names filled in) |
+| 28 contact fields (29 with Instantly), 7 deal fields, the tags | 3 forms: Refer a Client, Partner Sign-Up, Staff Attribution |
+| 3 pipelines: Partner Recruiting, Partner Lifecycle, Referred Leads | Up to 8 workflows, 7 without Instantly (exact steps, with the client's names filled in) |
 | The Partner Intro Call calendar | The Affiliate Manager campaign |
 | 5 custom values (page URLs, booking link, rate, owner) | The partner pages and the domain |
 | A pass/fail check of everything above, plus the workflows and forms by name | A2P (the client registers), the notification audit, tests, handover |
@@ -34,7 +34,7 @@ Every run writes a log to `out/` next to client.yaml. The token is never printed
 ## Rules it follows
 
 - Nothing touches the internet without `--live`. `preflight` and `verify` only read.
-- It reads what exists first and creates only what is missing. It never deletes. Edits happen only with `--repair` and only add (missing pipeline stages, our calendar's settings, a blank custom value).
+- It reads what exists first and creates only what is missing. It never deletes. Edits happen only with `--repair`: append missing pipeline stages, reset our own calendar's settings to client.yaml (full settings, never partial), fill a blank custom value.
 - Notifications go to named people, never "All users". Tasks go to one person. Everyone named must be a user of the sub-account.
 - No email or text reaches a partner or a customer until a person switches it on.
 

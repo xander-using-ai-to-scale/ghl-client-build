@@ -6,7 +6,7 @@
   ],
   "rulesForAll": [
     "Every Internal Notification goes to Particular user(s): ${derived.alert_list}. Never 'All users': GHL's default emails every user in the sub-account, our team included (trap T10).",
-    "Every task goes to one person: ${people.task_assignee_email}. GHL's task assignee is single-select; two people need two task steps.",
+    "Every task goes to one person: the one each step names (${people.task_assignee_email} or ${people.commission_approver_email}). The assignee is single-select; two people need two task steps.",
     "No partner- or client-facing emails or texts in v1. Their copy needs the client's approval first and is marked DRAFT.",
     "Deals are named {{contact.email}}. Instantly often sends no names, and Find opportunity matches on the name.",
     "To move an existing deal from a form- or contact-triggered workflow, use Find opportunity (pipeline + Opportunity Name = {{contact.email}}), then Update opportunity. 'Create opportunity' never updates an existing deal (trap T14).",

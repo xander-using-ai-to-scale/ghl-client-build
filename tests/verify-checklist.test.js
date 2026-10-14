@@ -52,6 +52,25 @@ test('verify: a calendar whose slotDuration was reset fails', async () => {
   assert.match(row.found, /slotDuration/);
 });
 
+test('verify: openHours with extra keys or another order is not drift', async () => {
+  const t = await builtAccount();
+  const cal = t.fake.state.calendars[0];
+  cal.openHours = cal.openHours.slice().reverse().map((o) => ({ ...o, extra: true, hours: o.hours.map((h) => ({ ...h, id: 'x' })) }));
+  const r = await runVerify({ resolved: t.resolved, ghl: t.ghl });
+  assert.equal(r.rows.find((x) => x.area === 'calendar' && /settings/.test(x.check)).result, 'PASS');
+});
+
+test('verify: confirmation-text keys GHL does not echo are a WARN, not a FAIL', async () => {
+  const t = await builtAccount();
+  delete t.fake.state.calendars[0].formSubmitType;
+  delete t.fake.state.calendars[0].formSubmitThanksMessage;
+  const r = await runVerify({ resolved: t.resolved, ghl: t.ghl });
+  assert.equal(r.summary.fail, 0, formatTable(r.rows.filter((x) => x.result === 'FAIL')));
+  const row = r.rows.find((x) => x.area === 'calendar' && /confirmation/.test(x.check));
+  assert.equal(row.result, 'WARN');
+  assert.match(row.found, /formSubmitType/);
+});
+
 test('verify: a person who is not a sub-account user fails', async () => {
   const t = await builtAccount();
   t.fake.state.users = [];

@@ -170,3 +170,11 @@ test('a failed read stops the build before any write', async () => {
   await assert.rejects(() => runBuild({ resolved: t.resolved, ghl: createGhl(http, 'loc_test'), mode: 'live' }), /Stopped before writing anything else/);
   assert.equal(writes(t.fake.calls).length, 0);
 });
+
+test('calendarDiff: openHours compared by day and window; unconfirmed keys reported apart', () => {
+  const { calendarDiff } = require('../lib/ghl.js');
+  const want = { slotDuration: 20, openHours: [{ daysOfTheWeek: [1], hours: [{ openHour: 10, openMinute: 0, closeHour: 17, closeMinute: 0 }] }], formSubmitType: 'ThankYouMessage' };
+  const keys = ['slotDuration', 'openHours', 'formSubmitType'];
+  assert.deepEqual(calendarDiff({ slotDuration: 20, openHours: [{ daysOfTheWeek: [1], hours: [{ openHour: 10, openMinute: 0, closeHour: 17, closeMinute: 0, id: 'a' }], extra: 1 }] }, want, keys), { drift: [], unconfirmed: ['formSubmitType'] });
+  assert.deepEqual(calendarDiff({ slotDuration: 30, openHours: [{ daysOfTheWeek: [2], hours: want.openHours[0].hours }], formSubmitType: 'ThankYouMessage' }, want, keys), { drift: ['slotDuration', 'openHours'], unconfirmed: [] });
+});

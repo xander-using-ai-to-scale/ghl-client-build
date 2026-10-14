@@ -67,6 +67,8 @@ test('hints explain the traps in plain words', () => {
   assert.match(hintFor(403, 'error code: 1010'), /User-Agent/);
   assert.match(hintFor(401, { message: 'user type mismatch' }), /SUB-ACCOUNT/);
   assert.match(hintFor(422, { message: ['property locationId should not exist'] }), /query string/);
+  assert.match(hintFor(401, { statusCode: 401, message: 'The token is not authorized for this scope.' }), /lacks a scope/);
+  assert.match(hintFor(401, { message: 'Invalid JWT' }), /Token rejected/);
 });
 
 test('pipeline PUT: locationId in the query string, stripped from the body', async () => {

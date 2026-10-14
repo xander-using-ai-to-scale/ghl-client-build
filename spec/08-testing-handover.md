@@ -48,6 +48,7 @@ Plus, for this pipeline: `verify --live` has no FAIL, and every MANUAL row has b
 2. Calendar rules agreed with the client: hours, daily maximum, video link, blocked dates.
 3. Staff walked through the monthly commission (§7.1) and the conflict review (§5.2).
 4. Every customer-facing piece is switched on by a person, one at a time: the partner pages, any partner email, SMS.
+5. The Private Integration token is rotated at handover: the client deletes ours or makes a new one.
 
 ## §8.5 Not in v1
 
