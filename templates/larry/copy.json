@@ -1,0 +1,14 @@
+{
+  "_about": [
+    "The message copy files, in the order they are written to out/template-copy.md by the checklist command.",
+    "In the copy: ${...} is filled from client.yaml (as everywhere in this repo); {{...}} is a GHL merge field and is left alone; [[WRITE: ...]] is a line the copywriter writes for this client (business-specific: a story, a product list).",
+    "Everything here is DRAFT. The client approves it in writing before any workflow that sends is switched on."
+  ],
+  "files": [
+    { "file": "stl.md", "title": "Speed to lead (STL)", "program": "stl", "when": "tpl.stl_on" },
+    { "file": "react.md", "title": "Reactivation (REACT)", "program": "react", "when": "tpl.react_on" },
+    { "file": "aff.md", "title": "Partner emails (AFF)", "program": "aff", "when": "tpl.aff_on" },
+    { "file": "aff-outreach-introducer.md", "each": "tpl.outreach", "when": "tpl.aff_on && item.copy == introducer", "title": "Partner outreach: ${item.name}", "program": "aff" },
+    { "file": "aff-outreach-peer.md", "each": "tpl.outreach", "when": "tpl.aff_on && item.copy == peer", "title": "Partner outreach: ${item.name}", "program": "aff" }
+  ]
+}

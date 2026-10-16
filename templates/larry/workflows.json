@@ -1,0 +1,379 @@
+{
+  "_about": [
+    "The larry template's workflows. Like config/workflows.json they are built in the UI (GHL has no workflow API, trap T4), from out/ui-checklist.md, all in Draft; verify checks each one by name.",
+    "Steps follow the source build as built, including its later changes: ad leads into the client's own pipeline, alerts to named users, a Mon-Fri sending window for REACT, SMS steps held until A2P. Source: spec/10-larry-template.md.",
+    "customer_facing: true = it emails or texts a lead, a customer or a partner. It stays Draft until a person switches it on after the client's go. Copy: out/template-copy.md."
+  ],
+  "programs": [
+    {
+      "key": "stl",
+      "title": "Speed to lead (STL)",
+      "when": "tpl.stl_on",
+      "spec": "10-larry-template §10.4",
+      "rules": [
+        "Every Internal Notification goes to Particular users: ${tpl.alert_list}. Never \"All users\" (trap T10).",
+        "Reply and call tasks go to ${tpl.assistant_email}. GHL due dates are whole days, so \"within 1 hour\" goes in the task title and the task is due today.",
+        "Time window on both sending workflows: ${tpl.stl_window_text}.",
+        "${tpl.sms_text}",
+        "Leads land in ${tpl.lead_pipeline} at ${tpl.lead_stage}. Ask the client where ad leads go BEFORE building: the source build was rebuilt when its leads moved to the client's own pipeline."
+      ]
+    },
+    {
+      "key": "react",
+      "title": "Database reactivation (REACT)",
+      "when": "tpl.react_on",
+      "spec": "10-larry-template §10.5",
+      "rules": [
+        "Segment workflows have no trigger: contacts are enrolled from the segment's smart list by bulk action, only on the client's go, one segment at a time.",
+        "Every segment workflow: Stop on response ON; Allow re-entry OFF; Allow multiple opportunities OFF; time window ${tpl.window_text}; unsubscribe link on every email.",
+        "Every Internal Notification goes to Particular users: ${tpl.alert_list}. Tasks go to ${tpl.assistant_email}.",
+        "${tpl.sms_text}",
+        "Email bodies go in through the editor's </> source view, one paragraph per block with a gap between them; otherwise the lines run together."
+      ]
+    },
+    {
+      "key": "aff",
+      "title": "Partner emails (AFF)",
+      "when": "tpl.aff_on",
+      "spec": "10-larry-template §10.6",
+      "rules": [
+        "This layer sits on the standard partner build: partner deals live in ${derived.names.recruiting} (before signing) and ${derived.names.lifecycle} (after), named {{contact.email}}; the partner's type, tier and referral count are the standard fields.",
+        "Every email is an email template first (Marketing -> Emails -> Templates), named \"AFF - <workflow> - <email>\", then picked in the Send Email step.",
+        "Email only until A2P is approved and the contact has SMS consent. ${tpl.sms_text}",
+        "No sending window was set on the source build's AFF workflows. Add ${tpl.window_text} if the client wants one.",
+        "Every Internal Notification goes to Particular users: ${tpl.alert_list}."
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "key": "stl_instant",
+      "program": "stl",
+      "when": "tpl.stl_on",
+      "name": "STL | Ad Lead - Instant Response",
+      "customer_facing": true,
+      "customerFacingWhy": "It texts and emails every new ad lead within a minute.",
+      "spec": "10-larry-template §10.4",
+      "trigger": "${tpl.lead_trigger}. If leads also arrive through a website form, add a second trigger: Form submitted -> that form (ask the client).",
+      "settings": [
+        "Time window: ${tpl.stl_window_text}",
+        "Stop on response: OFF (the instant reply goes out regardless)",
+        "Allow re-entry: OFF",
+        "Allow multiple opportunities: OFF"
+      ],
+      "steps": [
+        "If / else \"Already contacted?\": contact has tag stl:contacted -> END. Otherwise continue.",
+        "Add tag: ${tpl.source_tag}, stl:new.",
+        "Update contact field: stl_status -> new; stl_first_touch_at -> today (Dynamic -> Right now -> Date).",
+        "Create opportunity: pipeline ${tpl.lead_pipeline}, stage ${tpl.lead_stage}, name \"{{contact.name}} - Ad Lead\", source {{contact.source}}, allow duplicates OFF.",
+        "Assign to user: ${tpl.assistant_email}, only if the contact has no owner yet.",
+        "Send SMS: STL SMS 01.",
+        "Wait 1 minute.",
+        "Send Email: STL Email 01.",
+        "Internal notification (Email, Particular users: ${tpl.alert_list}): subject \"New ad lead: {{contact.name}}\"; body \"New ad lead: {{contact.name}} · {{contact.phone}} · {{contact.email}} · Form: {{contact.source}} · Instant SMS + email sent. {{contact.url}}\".",
+        "Internal notification (SMS, Particular user: ${tpl.owner_email}): \"New ad lead: {{contact.name}} {{contact.phone}}\".",
+        "Remove tag stl:new; add tag stl:contacted; stl_status -> contacted.",
+        "Wait 2 minutes.",
+        "Add to workflow: STL | Ad Lead - Follow-Up Ladder.",
+        {
+          "when": "tpl.aff_on",
+          "text": "If / else: contact has tag src:partner-referral -> Remove tag ${tpl.source_tag} (a partner referral handed over by the partner layer is not an ad lead)."
+        }
+      ],
+      "test": "Enroll an @example.com contact with a phone no other contact uses (trap T18). Expect stl:contacted, stl_status contacted, one deal at ${tpl.lead_stage} in ${tpl.lead_pipeline}, the alert, and the contact in the Follow-Up Ladder. Run it twice: the second run ends at \"Already contacted?\"."
+    },
+    {
+      "key": "stl_ladder",
+      "program": "stl",
+      "when": "tpl.stl_on",
+      "name": "STL | Ad Lead - Follow-Up Ladder",
+      "customer_facing": true,
+      "customerFacingWhy": "It texts and emails the lead over 7 days.",
+      "spec": "10-larry-template §10.4",
+      "trigger": "None: contacts are added by STL | Ad Lead - Instant Response.",
+      "settings": [
+        "Stop on response: ON",
+        "Allow re-entry: OFF",
+        "Time window: ${tpl.stl_window_text}",
+        "Goal: Contact tag added stl:quick-app-complete -> the Complete branch (add the client's own \"application finished\" form as a second goal event if there is one)"
+      ],
+      "steps": [
+        "Wait 15 minutes.",
+        "If / else \"Replied yet?\": contact has tag stl:replied -> END.",
+        "Send SMS: STL SMS 02.",
+        "Wait 1 day.",
+        "Send Email: STL Email 02.",
+        "Wait 1 day.",
+        "Send SMS: STL SMS 03.",
+        "Wait 2 days.",
+        "Send Email: STL Email 03.",
+        "Add task: \"Call {{contact.name}} - no response to 4 touches\", assigned to ${tpl.assistant_email}, due today.",
+        "Wait 3 days.",
+        "Send SMS: STL SMS 04.",
+        "Add tag: stl:no-response, react:segment-${tpl.unfinished_app_segment} (feeds the unfinished-application reactivation segment); stl_status -> no-response.",
+        "Complete branch (goal hit): add tag stl:handoff-${tpl.sender_slug}; stl_status -> quick-app-complete; Internal notification (Email, Particular users: ${tpl.alert_list}) \"Quick app complete: {{contact.name}}\"; Find opportunity (pipeline ${tpl.lead_pipeline}, the contact's open deal), then Update opportunity -> stage ${tpl.app_done_stage}. END."
+      ],
+      "test": "With the waits set to 1 minute on a test copy: an @example.com contact gets SMS 02 to SMS 04, the call task, then stl:no-response. Adding stl:quick-app-complete mid-way jumps to Complete and moves the deal to ${tpl.app_done_stage}."
+    },
+    {
+      "key": "stl_router",
+      "program": "stl",
+      "when": "tpl.stl_on",
+      "name": "STL | Inbound Reply Router",
+      "customer_facing": false,
+      "spec": "10-larry-template §10.4",
+      "trigger": "Customer replied (SMS and email). Filters: contact has tag stl:contacted AND does not have tag stl:replied.",
+      "settings": [
+        "Allow re-entry: OFF"
+      ],
+      "steps": [
+        "Add tag stl:replied; stl_status -> replied.",
+        "Remove from workflow: STL | Ad Lead - Follow-Up Ladder.",
+        "${tpl.replied_stage_step}",
+        "Internal notification (Email, Particular users: ${tpl.alert_list}): \"Reply from {{contact.name}}: {{message.body}} · {{contact.url}}\".",
+        "Add task: \"Reply to {{contact.name}} within 1 hour\", assigned to ${tpl.assistant_email}, due today."
+      ],
+      "test": "Reply to the test contact's STL email: stl:replied is added, the ladder stops, the alert and the task arrive."
+    },
+    {
+      "key": "react_segment_${item.num}",
+      "each": "tpl.message_segments",
+      "program": "react",
+      "when": "tpl.react_on",
+      "name": "REACT | Segment ${item.num} - ${item.name}",
+      "customer_facing": true,
+      "customerFacingWhy": "It texts and emails past contacts over 14 days.",
+      "spec": "10-larry-template §10.5",
+      "trigger": "None: enrolled by bulk action from the smart list \"REACT | ${item.num} - ${item.name}\".",
+      "settings": [
+        "Stop on response: ON",
+        "Allow re-entry: OFF",
+        "Allow multiple opportunities: OFF",
+        "Time window: ${tpl.window_text}",
+        "Copy: sequence \"${item.sequence}\""
+      ],
+      "steps": [
+        "If / else \"Safety\": contact has tag react:excluded -> END.",
+        "Add tag react:sent; remove tag react:queued; react_last_touch_at -> today.",
+        {
+          "when": "!item.email_only",
+          "text": "Send SMS: sequence \"${item.sequence}\", SMS Day 0."
+        },
+        {
+          "when": "!item.email_only",
+          "text": "Wait 30 minutes."
+        },
+        "Send Email: sequence \"${item.sequence}\", Email Day 0.",
+        "Wait 3 days.",
+        "Send Email: sequence \"${item.sequence}\", Email Day 3.",
+        "Wait 4 days.",
+        {
+          "when": "!item.email_only",
+          "text": "Send SMS: sequence \"${item.sequence}\", SMS Day 7."
+        },
+        "Wait 7 days.",
+        "Send Email: sequence \"${item.sequence}\", Email Day 14.",
+        "Add tag react:not-now.",
+        "Wait 60 days.",
+        "Add to workflow: REACT | Re-entry - Check-in."
+      ],
+      "test": "Enroll one @example.com contact tagged react:segment-${item.num}, with every wait at 1 minute on a test copy: each message arrives in order; a reply stops it and the REACT Reply Router fires."
+    },
+    {
+      "key": "react_reentry",
+      "program": "react",
+      "when": "tpl.react_on",
+      "name": "REACT | Re-entry - Check-in",
+      "customer_facing": true,
+      "customerFacingWhy": "It emails a contact 60 days after the sequence or a \"not now\" reply.",
+      "spec": "10-larry-template §10.5",
+      "trigger": "None: contacts are added by the segment workflows and the REACT Reply Router.",
+      "settings": [
+        "Allow re-entry: OFF",
+        "Time window: ${tpl.window_text}"
+      ],
+      "steps": [
+        "Send Email: REACT Re-entry email (one email)."
+      ],
+      "test": "Add the test contact by hand: one email arrives."
+    },
+    {
+      "key": "react_router",
+      "program": "react",
+      "when": "tpl.react_on",
+      "name": "REACT | Reply Router",
+      "customer_facing": false,
+      "spec": "10-larry-template §10.5",
+      "trigger": "Customer replied (SMS and email). Filters: contact has tag react:sent AND does not have tag react:replied.",
+      "settings": [
+        "Allow re-entry: OFF"
+      ],
+      "steps": [
+        "Add tag react:replied.",
+        "Remove from workflow: ${tpl.segment_workflow_names}, REACT | Re-entry - Check-in.",
+        "Internal notification (Email, Particular users: ${tpl.alert_list}): \"Reactivation reply from {{contact.name}} ({{contact.react_segment}}): {{message.body}} · {{contact.url}}\".",
+        "If / else on the reply text (\"contains\" any of): Stop = stop, unsubscribe, remove, don't contact, don’t contact, do not contact; Not now = not now, later, next year, maybe, busy; Wrong person = wrong, not me, no longer, retired, sold; Interested = everything else (the last branch).",
+        "Stop: Set DND, all channels; add tag react:do-not-contact. END.",
+        "Not now: add tag react:not-now; Wait 60 days; Add to workflow REACT | Re-entry - Check-in. END.",
+        "Wrong person: add tag react:do-not-contact. END.",
+        "Interested: add tag react:interested; Create opportunity in ${tpl.lead_pipeline} at ${tpl.lead_stage}, name \"{{contact.name}} - Reactivation\", source \"Reactivation {{contact.react_segment}}\", allow duplicates OFF; Add task \"Reactivation reply - call {{contact.name}} within 2 hours\", assigned to ${tpl.assistant_email}, due today. END."
+      ],
+      "test": "Reply \"stop\", \"maybe later\", \"wrong person\" and \"yes, tell me more\" from four test contacts: each lands in its branch. Matching is \"contains\", so \"sold\" also matches \"unsold\": check real replies before go-live."
+    },
+    {
+      "key": "aff_call_booked",
+      "program": "aff",
+      "when": "tpl.aff_on",
+      "name": "AFF | Call Booked",
+      "customer_facing": true,
+      "customerFacingWhy": "It emails the partner a booking confirmation.",
+      "spec": "10-larry-template §10.6",
+      "trigger": "Customer booked appointment, calendar ${derived.names.calendar}.",
+      "settings": [
+        "Allow re-entry: ON (a partner can book again)"
+      ],
+      "steps": [
+        "Send Email: AFF - Call Booked - Confirmation (right after the trigger).",
+        "Add tag aff:call-booked.",
+        "Create opportunity: ${derived.names.recruiting} at Booked, name {{contact.email}}, allow duplicates OFF. Then Find opportunity (same pipeline, Opportunity Name = {{contact.email}}) and Update opportunity -> stage Booked, so a deal that already exists moves too (trap T14).",
+        "Remove from workflow: AFF | Partner Nurture - Every Other Day, ${tpl.outreach_workflow_names}.",
+        "Internal notification (Email, Particular users: ${tpl.alert_list}): \"Partner call booked: {{contact.name}}\", with Partner Type, the source and the last message.",
+        {
+          "when": "tpl.sms_on",
+          "text": "Wait until 1 hour before the appointment, then Send SMS: AFF call reminder (contacts with SMS consent only)."
+        }
+      ],
+      "test": "Book the partner calendar as an @example.com contact: the confirmation email, aff:call-booked, the deal at Booked and the alert. Check that {{appointment.start_time}} renders in the email."
+    },
+    {
+      "key": "aff_no_show",
+      "program": "aff",
+      "when": "tpl.aff_on",
+      "name": "AFF | Call No-Show",
+      "customer_facing": true,
+      "customerFacingWhy": "It emails the partner a new booking link.",
+      "spec": "10-larry-template §10.6",
+      "trigger": "Appointment status changed to No-show, calendar ${derived.names.calendar}.",
+      "settings": [
+        "Allow re-entry: OFF (the re-offer goes once)"
+      ],
+      "steps": [
+        "Add tag aff:no-show.",
+        "Send Email: AFF - Call Booked - No-show re-offer."
+      ],
+      "test": "Mark the test booking No-show: aff:no-show and one re-offer email."
+    },
+    {
+      "key": "aff_router",
+      "program": "aff",
+      "when": "tpl.aff_on",
+      "name": "AFF | Reply Router",
+      "customer_facing": false,
+      "spec": "10-larry-template §10.6",
+      "trigger": "Two triggers. Customer replied, filters: tag aff:signed AND not aff:replied. Customer replied, filters: tag aff:outreach-sent AND not aff:replied.",
+      "settings": [
+        "Allow re-entry: OFF"
+      ],
+      "steps": [
+        "Add tag aff:replied.",
+        "Internal notification (Email, Particular users: ${tpl.alert_list}): \"Partner reply from {{contact.name}}: {{message.body}} · {{contact.url}}\".",
+        "If / else on the reply text (\"contains\" any of): Stop = stop, unsubscribe; Not interested = not interested, no thanks, covered; Comp question = commission, pay, split, comp, %; Other = everything else (the last branch).",
+        "Stop: Set DND, all channels; add tag aff:declined. END.",
+        "Not interested: add tag aff:declined. END.",
+        "Comp question: Add task \"Comp question from {{contact.name}}\", assigned to ${tpl.owner_email}, due in 1 day. The approved no-numbers reply is in the copy. END.",
+        "Other: Add task \"Partner reply - respond to {{contact.name}} within 2 hours\", assigned to ${tpl.assistant_email}, due today. Reply snippets are in the copy. END.",
+        "No deal-stage moves here (left out in the source build): the person who handles the reply moves the deal."
+      ],
+      "test": "Reply to a test outreach email with \"not interested\", \"what's the commission?\" and \"sounds good\": each lands in its branch with its task."
+    },
+    {
+      "key": "aff_nurture",
+      "program": "aff",
+      "when": "tpl.aff_on",
+      "name": "AFF | Partner Nurture - Every Other Day",
+      "customer_facing": true,
+      "customerFacingWhy": "It emails every new partner 8 times over 14 days.",
+      "spec": "10-larry-template §10.6",
+      "trigger": "Contact tag added: aff:signed.",
+      "settings": [
+        "Stop on response: ON",
+        "Allow re-entry: OFF"
+      ],
+      "steps": [
+        "Send Email: AFF - Nurture - Email 1 · Day 0.",
+        "Wait 2 days.",
+        "Send Email: AFF - Nurture - Email 2 · Day 2.",
+        "Wait 2 days.",
+        "Send Email: AFF - Nurture - Email 3 · Day 4.",
+        "Wait 2 days.",
+        "Send Email: AFF - Nurture - Email 4 · Day 6.",
+        "Wait 2 days.",
+        "Send Email: AFF - Nurture - Email 5 · Day 8.",
+        "Wait 2 days.",
+        "Send Email: AFF - Nurture - Email 6 · Day 10.",
+        "Wait 2 days.",
+        "Send Email: AFF - Nurture - Email 7 · Day 12.",
+        "Wait 2 days.",
+        "Send Email: AFF - Nurture - Email 8 · Day 14."
+      ],
+      "test": "Tag a test partner aff:signed with the waits at 1 minute on a test copy: 8 emails in order; a reply stops them."
+    },
+    {
+      "key": "aff_checkin",
+      "program": "aff",
+      "when": "tpl.aff_on",
+      "name": "AFF | Partner Check-In - 30/60",
+      "customer_facing": true,
+      "customerFacingWhy": "It emails partners at 30 and 60 days.",
+      "spec": "10-larry-template §10.6",
+      "trigger": "Contact tag added: aff:signed.",
+      "settings": [
+        "Stop on response: ON",
+        "Allow re-entry: OFF"
+      ],
+      "steps": [
+        "Wait 30 days.",
+        "If / else: Referrals Sent is greater than 0 -> \"Has referred\" branch; else -> \"No referral yet\" branch.",
+        "Has referred: Wait 30 days; Send Email: AFF - Check-In - Day 60. END.",
+        "No referral yet: Send Email: AFF - Check-In - Day 30; Wait 30 days; Send Email: AFF - Check-In - Day 60. END.",
+        "Nothing increments Referrals Sent automatically (the source build was the same): whoever confirms a referral updates it."
+      ],
+      "test": "With the waits at 1 minute on a test copy: a partner with Referrals Sent 0 gets Day 30 then Day 60; with 1 gets Day 60 only."
+    },
+    {
+      "key": "aff_outreach_${item.key}",
+      "each": "tpl.outreach",
+      "program": "aff",
+      "when": "tpl.aff_on",
+      "name": "AFF | Outreach - ${item.name}",
+      "customer_facing": true,
+      "customerFacingWhy": "It cold-emails prospective partners (${item.audience}).",
+      "spec": "10-larry-template §10.6",
+      "trigger": "Contact tag added: aff:queue-${item.key}.",
+      "settings": [
+        "Stop on response: ON",
+        "Allow re-entry: OFF",
+        "Copy: outreach set \"${item.copy}\" (${item.audience})"
+      ],
+      "steps": [
+        "Add tag aff:outreach-sent.",
+        "Send Email: AFF - Outreach ${item.name} - Email 1.",
+        {
+          "when": "tpl.sms_on",
+          "text": "Send SMS: SMS 1 (contacts with SMS consent only)."
+        },
+        "Wait 3 days.",
+        "Send Email: AFF - Outreach ${item.name} - Email 2 (subject \"re: \" + the Email 1 subject, so it reads as a reply in the same thread).",
+        "Wait 4 days.",
+        "Send Email: AFF - Outreach ${item.name} - Email 3.",
+        "Wait 5 days.",
+        "Send Email: AFF - Outreach ${item.name} - Email 4.",
+        {
+          "when": "tpl.sms_on",
+          "text": "Send SMS: SMS 4 (contacts with SMS consent only)."
+        }
+      ],
+      "test": "Tag an @example.com contact that has a company name aff:queue-${item.key}: aff:outreach-sent and Email 1 arrive; a reply stops the sequence and the AFF Reply Router fires."
+    }
+  ]
+}

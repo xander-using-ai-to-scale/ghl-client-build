@@ -1,0 +1,45 @@
+{
+  "_about": [
+    "Tags the larry template adds, over the API. Names are the source build's (live account, Oct 17 2026), except where a name carried the source client's name or a dated import batch (spec/10-larry-template.md §10.3).",
+    "'each' repeats a tag per item: one react:segment-NN per segment, one aff:queue-<key> per outreach list."
+  ],
+  "tags": [
+    { "name": "src:fb-ad", "spec": "10-larry-template §10.3" },
+    { "name": "src:ig-ad", "spec": "10-larry-template §10.3" },
+    { "name": "src:website-form", "spec": "10-larry-template §10.3" },
+    { "name": "src:quick-app", "spec": "10-larry-template §10.3" },
+    { "name": "src:partner-referral", "spec": "10-larry-template §10.3" },
+    { "name": "src:instantly", "spec": "10-larry-template §10.3" },
+    { "name": "src:linkedin", "spec": "10-larry-template §10.3" },
+    { "name": "${tpl.source_tag}", "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+
+    { "name": "stl:new", "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+    { "name": "stl:contacted", "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+    { "name": "stl:replied", "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+    { "name": "stl:no-response", "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+    { "name": "stl:quick-app-complete", "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+    { "name": "stl:handoff-${tpl.sender_slug}", "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+
+    { "name": "react:segment-${item.num}", "each": "tpl.segments", "when": "tpl.react_tags_on", "spec": "10-larry-template §10.3" },
+    { "name": "react:queued", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react:sent", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react:replied", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react:interested", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react:not-now", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react:do-not-contact", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react:excluded", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+
+    { "name": "aff:prospect", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:outreach-sent", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:replied", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:call-booked", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:signed", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:onboarded", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:active", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:dormant", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:declined", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:referred-lead", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:no-show", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "aff:queue-${item.key}", "each": "tpl.outreach", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" }
+  ]
+}

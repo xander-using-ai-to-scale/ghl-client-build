@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.0 (Oct 17 2026)
+
+Template `larry`: Larry's speed to lead, reactivation and partner emails, for any client. 85 offline tests (`node --test`), 64 before.
+
+- `template.name: larry` in client.yaml switches it on; `templates/larry/` holds it as data, like `config/`. Its objects go through the same build, verify and checklist code: create-only, never delete or rename, Draft first, verify by name.
+- API: 7 contact fields (`stl_*`, `react_*`), the STL, REACT and AFF tags (one segment tag per segment, one queue tag per outreach list), `STL | Inbound Leads` only when the client has no lead pipeline, `AFF | Broker Intake` on request, 7 custom values named `<prefix>_*`.
+- Checklist: 3 STL, up to 7 REACT and 5 + one-per-list AFF workflows with every step, trigger, wait, window and person filled in; the REACT smart lists; additions to the standard Partner Sign-Up and Referral Capture; setup, segment tagging and go-live steps. SMS steps appear only once A2P is approved.
+- Copy: `checklist` also writes `out/template-copy.md`, every message DRAFT, from `templates/larry/copy/`. Business-specific lines are `[[WRITE: ...]]` prompts.
+- verify: smart lists, copy approval and email templates are MANUAL rows; template people are checked as sub-account users. preflight checks the template inputs only when it is on.
+- `when` conditions take `&&`. `CODEX.md`: the one page to paste into Codex or Claude Code.
+- `spec/10-larry-template.md`: what the template builds, a 51-row parity table against Larry's live account (read with GET only, Oct 17) and the build record, and 8 differences between the docs and the live account. `tests/fixtures/larry-live-2026-10-17.json` keeps the live names (no contact data); a test checks the template still gives them.
+- CLIENT-CHECKLIST and client.example.yaml: the template's inputs.
+
 ## v0.1.1 (Oct 14 2026)
 
 Fixes from an accuracy audit against the sources. 64 offline tests (`node --test`).

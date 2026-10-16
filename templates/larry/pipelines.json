@@ -1,0 +1,23 @@
+{
+  "_about": [
+    "Pipelines the larry template adds, over the API (create-only, like the standard build).",
+    "STL | Inbound Leads only when the client has no lead pipeline of its own (template.stl.own_lead_pipeline empty). The source build later moved ad leads into the client's own pipeline: ask first.",
+    "The partner layer uses the standard build's Partner Recruiting and Partner Lifecycle pipelines, not the source build's 'AFF | Partner Pipeline' (spec/10-larry-template.md §10.3)."
+  ],
+  "pipelines": [
+    {
+      "key": "stl_inbound",
+      "name": "STL | Inbound Leads",
+      "when": "tpl.stl_pipeline_on",
+      "stages": ["New Lead", "Contacted", "Engaged", "Quick App Complete", "Handed to ${tpl.sender_first_name}", "No Response / Not a Fit"],
+      "spec": "10-larry-template §10.3"
+    },
+    {
+      "key": "aff_broker_intake",
+      "name": "AFF | Broker Intake",
+      "when": "tpl.broker_intake_on",
+      "stages": ["Application Received", "Reviewing", "Needs More", "Approved", "Active"],
+      "spec": "10-larry-template §10.3"
+    }
+  ]
+}

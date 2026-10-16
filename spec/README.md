@@ -19,6 +19,7 @@ Recruit partners -> make referring easy -> capture who referred whom (online or 
 | 7 | Commission cycle, notifications, SMS and A2P, email sending | Both | [07-commissions-notifications.md](07-commissions-notifications.md) |
 | 8 | Access, tests, acceptance criteria, handover, what v1 leaves out | People | [08-testing-handover.md](08-testing-handover.md) |
 | 9 | The GHL traps and where the code guards against each | Code + docs | [09-ghl-traps.md](09-ghl-traps.md) |
+| 10 | Optional template `larry`: speed to lead, reactivation, partner emails; parity with the live build | API + UI + copy | [10-larry-template.md](10-larry-template.md) |
 
 Every object in `config/` carries a `spec` reference to a section here, and a test checks that each reference exists.
 

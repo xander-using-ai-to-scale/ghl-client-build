@@ -37,6 +37,10 @@ Before step 5, show the person the step-4 plan and get a clear yes. Use `--repai
 
 If `ghl.platform` is `other`, run steps 1 and 6 only and stop: the spec and the checklist describe what to build in their system.
 
+### With a template
+
+If the person asks for "Larry's system" (or `template.name: larry` is set), follow [CODEX.md](CODEX.md) as well: it lists the extra inputs, the copy approval and the go-live order. `checklist` then also writes `out/template-copy.md`, which is DRAFT: write its `[[WRITE: ...]]` lines, then the client approves it before anything that sends is switched on. Tagging or enrolling the client's contacts into reactivation needs the account owner's go; this repo never writes contacts.
+
 ## 4. GHL traps (all in spec/09-ghl-traps.md)
 
 - Every API call needs a browser User-Agent; without it Cloudflare answers 1010, which looks like an auth error. The code handles it. Do not write your own curl calls to GHL.

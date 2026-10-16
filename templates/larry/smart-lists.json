@@ -1,0 +1,17 @@
+{
+  "_about": [
+    "REACT segments as smart lists. GHL has no smart-list API (trap T5), so these are built in the UI from the checklist; verify lists them as MANUAL.",
+    "As built: one list per segment, filtered on its tag. Contacts get the tag first (Contacts -> bulk action, or a script run with the account owner's go), from the rule."
+  ],
+  "smartLists": [
+    {
+      "name": "REACT | ${item.num} - ${item.name}",
+      "each": "tpl.segments",
+      "when": "tpl.react_on",
+      "filter": "Tag is react:segment-${item.num}",
+      "rule": "${item.rule}",
+      "sequence": "${item.sequence}",
+      "spec": "10-larry-template §10.5"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "_about": [
+    "UI steps for the larry template, rendered into out/ui-checklist.md after the standard workflows.",
+    "'program' says which program a section belongs to (all = the template as a whole); 'place' says whether it comes before or after that program's workflows."
+  ],
+  "sections": [
+    {
+      "key": "tpl_inputs",
+      "program": "all",
+      "place": "before",
+      "title": "Template: inputs, custom values and copy",
+      "spec": "10-larry-template §10.2",
+      "steps": [
+        "The template adds speed to lead, reactivation and the partner email layer on top of the standard build. Programs on: STL ${tpl.stl_on}, REACT ${tpl.react_on}, AFF emails ${tpl.aff_on} (client.yaml template.*.enabled).",
+        "Settings -> Custom Values: check the values the build wrote with the prefix ${tpl.p}_ (${tpl.cv_name.quick_app_url}, ${tpl.cv_name.sender_phone}, ${tpl.cv_name.sender_email}, ${tpl.cv_name.assistant_email}, and the partner links). A single space means 'not supplied yet'.",
+        "Copy: out/template-copy.md (written next to this checklist). It is DRAFT: the client approves it in writing before any workflow that sends is switched on. Then set template.copy.approved: true in client.yaml. Approved: ${template.copy.approved}.",
+        "Every email ends with the sender's first name, then the signature line '${template.sender_name} · ${client.name} · ${tpl.cv.sender_phone}', then GHL's unsubscribe footer.",
+        "No prices, rates, approvals, closing times or fee amounts in any message. Referral terms are covered on the intro call only.",
+        "Sending: from ${derived.from_text}. Until the client has its own authenticated sending domain, GHL sends from its shared domain: fine for warm contacts, not for volume."
+      ]
+    },
+    {
+      "key": "stl_setup",
+      "program": "stl",
+      "place": "before",
+      "title": "Speed to lead: before building",
+      "spec": "10-larry-template §10.4",
+      "steps": [
+        "Ask the client how ad leads land in GHL (Facebook lead-form integration, a website form, a webhook) and which pipeline they use. Trigger in client.yaml: ${tpl.lead_trigger}.",
+        "Leads go to ${tpl.lead_pipeline}: new at ${tpl.lead_stage}, finished application at ${tpl.app_done_stage}. If the client has its own lead pipeline, set template.stl.own_lead_pipeline and its stages; the build then skips STL | Inbound Leads.",
+        "Short application link (${tpl.cv_name.quick_app_url}): ${template.stl.quick_app_url}. Every STL and REACT message links to it.",
+        "Check the client's own lead workflows first (assignment, auto-replies, their own alerts) so a lead does not get two first texts. Never edit or pause theirs without asking."
+      ]
+    },
+    {
+      "key": "react_segments",
+      "program": "react",
+      "place": "before",
+      "title": "Reactivation: inventory, segments and smart lists",
+      "spec": "10-larry-template §10.5",
+      "steps": [
+        "Inventory first, read-only: tags with counts, pipelines and stages with open and won deals, DND counts, contacts by last activity and date added, fields that hold product or deal status. Past-client data: ${template.react.past_client_data}.",
+        "Tag each contact with one segment only, in this priority: 01, 02, 03, 05, 04, 06. Set react_segment, and react_context (the one-line 'what you were working on' phrase the first sequence quotes). These are contact writes: they need the account owner's go and are not done by this repo.",
+        "No exclude list and no never-contact list were built in the source build (the owner's decision); the react:excluded check stays in every workflow. If the client wants exclusions, add react:excluded by bulk action.",
+        "Build one smart list per segment (Contacts -> Smart Lists -> filter Tag is react:segment-NN), named as in the table below.",
+        "Enroll only on the client's go, one segment at a time: from the smart list, Bulk Actions -> Add to Workflow -> the segment's workflow, drip mode on, ${tpl.drip_batch} a day, ${tpl.drip_days}, ${tpl.drip_window}.",
+        "Segment ${tpl.handoff_text}: no reactivation. Tag those contacts aff:queue-${tpl.first_outreach_key} for partner outreach once the client approves.",
+        "Pause rule: if a day's bounces pass 3% or spam complaints pass 0.2%, set the segment workflow back to Draft (enrolled contacts stop) and tell the client."
+      ]
+    },
+    {
+      "key": "aff_additions",
+      "program": "aff",
+      "place": "before",
+      "title": "Partner emails: additions to the standard workflows",
+      "spec": "10-larry-template §10.6",
+      "steps": [
+        "${derived.prefix}Referral Engine - Partner Sign-Up: right after the trigger, Send Email: AFF - Signed Up - AFF Welcome.",
+        "${derived.prefix}Referral Engine - Partner Sign-Up: Add tag aff:signed (it starts the Partner Nurture and the Check-In).",
+        "${derived.prefix}Referral Engine - Partner Sign-Up: Internal notification (Email, Particular users: ${tpl.alert_list}) 'New partner signed up: {{contact.name}}'.",
+        "${derived.prefix}Referral Engine - Partner Sign-Up, at the end: Wait 7 days; Add task 'Activation touch: {{contact.name}} - who is one customer you talked to this month?' to ${tpl.assistant_email}; add tag aff:onboarded.",
+        "${derived.prefix}Referral Engine - Referral Capture, First claim branch: add tag aff:referred-lead, src:partner-referral.",
+        { "when": "tpl.stl_on", "text": "${derived.prefix}Referral Engine - Referral Capture, First claim branch, last step: Add to workflow STL | Ad Lead - Instant Response, so the referred lead gets the instant reply (it removes the ad source tag for partner referrals)." },
+        "Not built, as in the source build: a thank-you email to the partner when a referral arrives. The referral workflow runs on the referred contact, so it cannot email the partner. Copy is ready in out/template-copy.md if the client wants it sent by hand.",
+        "Load every AFF email in out/template-copy.md as an email template named 'AFF - <workflow> - <email>' (Marketing -> Emails -> Templates). Paste the body through the </> source view."
+      ]
+    },
+    {
+      "key": "aff_queue",
+      "program": "aff",
+      "place": "after",
+      "title": "Partner emails: who gets outreach",
+      "spec": "10-larry-template §10.6",
+      "steps": [
+        "One outreach workflow per partner list: ${tpl.outreach_workflow_names}. A contact enters by getting the tag aff:queue-<key>.",
+        "Queue only contacts with a company name: Email 1 uses {{contact.company_name}}.",
+        "Cold partner lists never go into GHL by CSV import: GHL makes you confirm every contact consented and was contacted in the last year. Cold lists go to a cold-email tool with its own inboxes; GHL gets the ones who reply.",
+        "Queue a few a day and watch the replies before raising the volume."
+      ]
+    },
+    {
+      "key": "tpl_golive",
+      "program": "all",
+      "place": "after",
+      "title": "Template: tests and go-live",
+      "spec": "10-larry-template §10.7",
+      "steps": [
+        "Run every workflow's test on @example.com contacts with unique phones. Set waits to 1 minute only on a test copy, never on the real workflow.",
+        "verify --live shows every template workflow in Draft. MANUAL rows: the smart lists, the copy approval, the email templates.",
+        "Go live one program at a time, each on the client's written go: speed to lead first, then the partner emails, then reactivation segment by segment. Agree the order with the client.",
+        "After a person switches a workflow on, verify --live shows it as WARN (customer-facing and live). That is expected; check the person and the date in the run log."
+      ]
+    }
+  ]
+}

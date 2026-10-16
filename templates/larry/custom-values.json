@@ -1,0 +1,16 @@
+{
+  "_about": [
+    "Custom values the larry template adds, over the API. Names are <template.value_prefix>_<what>, as in the source build (spec/10-larry-template.md §10.3).",
+    "The sender's phone and email take the sender's first name, as in the source build (<prefix>_<first name>_phone).",
+    "A blank value is stored as a single space (trap T9); build --live --repair fills it once client.yaml has it. '@booking_url' is the standard calendar's booking link."
+  ],
+  "customValues": [
+    { "name": "${tpl.cv_name.quick_app_url}", "value": "${template.stl.quick_app_url}", "spec": "10-larry-template §10.3" },
+    { "name": "${tpl.cv_name.partner_signup_url}", "value": "${tpl.partner_signup_url}", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "${tpl.cv_name.partner_calendar_url}", "value": "@booking_url", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "${tpl.cv_name.referral_form_url}", "value": "${tpl.referral_form_url}", "when": "tpl.aff_on", "spec": "10-larry-template §10.3" },
+    { "name": "${tpl.cv_name.sender_phone}", "value": "${template.sender_phone}", "spec": "10-larry-template §10.3" },
+    { "name": "${tpl.cv_name.sender_email}", "value": "${template.sender_email}", "spec": "10-larry-template §10.3" },
+    { "name": "${tpl.cv_name.assistant_email}", "value": "${template.assistant_email}", "spec": "10-larry-template §10.3" }
+  ]
+}

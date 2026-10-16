@@ -14,6 +14,8 @@ Installs our Referral Partner Engine in a client's GoHighLevel sub-account: part
 
 It never deletes anything, never renames anything, and builds every customer-facing piece switched off.
 
+**Template `larry` (optional):** adds our first lender build's three programs on top: speed to lead for ad leads (STL), database reactivation (REACT) and the partner emails (AFF). Its fields, tags, pipeline and custom values go in over the API; its workflows, smart lists and copy go in the checklist, all in Draft. Switch it on with `template.name: larry` in client.yaml. See [templates/larry/README.md](templates/larry/README.md) and [spec/10-larry-template.md](spec/10-larry-template.md).
+
 ## How to run it (5 steps)
 
 You need Node.js 18 or newer and Claude Code.
@@ -30,6 +32,8 @@ You need Node.js 18 or newer and Claude Code.
    - `node ghl-client-build/bin/ghl-build.js verify --live` prints a pass/fail table. Done when it has no FAIL and every MANUAL row is checked.
 
 Every run writes a log to `out/` next to client.yaml. The token is never printed or logged.
+
+**To build Larry's system for a new client**, paste [CODEX.md](CODEX.md) into Codex or Claude Code in the client's folder, with the client's details filled in. It is the same run with `template.name: larry`; `checklist` also writes the DRAFT copy to `out/template-copy.md`.
 
 ## Rules it follows
 

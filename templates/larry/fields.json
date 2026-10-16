@@ -1,0 +1,16 @@
+{
+  "_about": [
+    "Contact fields the larry template adds, over the API. Names, types and options are the source build's, read from the live account on Oct 17 2026.",
+    "The source build's aff_* fields are not here: the partner layer uses the standard build's fields instead (aff_category -> Partner Type, aff_partner_tier -> Partner Tier, aff_referred_by -> Referring Partner Name/ID, aff_referrals_count -> Referrals Sent, aff_signed_date -> Agreement Signed Date, aff_status -> pipeline stage). See spec/10-larry-template.md §10.3."
+  ],
+  "contact": [
+    { "name": "stl_first_touch_at", "dataType": "DATE", "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+    { "name": "stl_status", "dataType": "SINGLE_OPTIONS", "options": ["new", "contacted", "replied", "no-response", "quick-app-complete", "handoff"], "when": "tpl.stl_on", "spec": "10-larry-template §10.3" },
+    { "name": "react_segment", "dataType": "SINGLE_OPTIONS", "options": "${tpl.segment_options}", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react_style", "dataType": "SINGLE_OPTIONS", "options": ["check-in", "its-${tpl.sender_slug}", "whats-changed"], "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react_batch", "dataType": "TEXT", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react_last_touch_at", "dataType": "DATE", "when": "tpl.react_on", "spec": "10-larry-template §10.3" },
+    { "name": "react_context", "dataType": "TEXT", "when": "tpl.react_on", "spec": "10-larry-template §10.3" }
+  ],
+  "opportunity": []
+}

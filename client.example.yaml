@@ -96,6 +96,89 @@ instantly:
   workspace_access: false                    # [checklist, if enabled]
   webhook_url: ""                            # [go-live, if enabled] the GHL trigger URL, after the workflow is built
 
+template:
+  # Optional layer on top of the standard build. "" = the standard build only.
+  # larry = add our first lender build's three programs: speed to lead (STL), database
+  # reactivation (REACT) and the partner emails (AFF). See templates/larry/README.md and
+  # spec/10-larry-template.md. Every workflow is built in Draft; copy is DRAFT until the client approves.
+  # Leave an input out and the template uses the source build's default.
+  name: ""                                   # [build] "" | larry
+  value_prefix: sr                           # [build, if larry] custom values become sr_quick_app_url, ...
+  sender_name: Dana Example                  # [build, if larry] signs every email; first name names two values (sr_dana_phone)
+  sender_phone: "+1 555 0100"                # [go-live, if larry] in signatures
+  sender_email: dana@summitridgeroofing.example   # [go-live, if larry]
+  assistant_email: builder@agency.example    # [checklist, if larry] reply and call tasks (a sub-account user)
+  owner_email: builder@agency.example        # [checklist, if larry] owner tasks and the new-lead SMS alert
+  sending_window:                            # REACT sending window (as built: Mon-Fri 9-5, account time zone)
+    days: [mon, tue, wed, thu, fri]
+    start: "09:00"
+    end: "17:00"
+    timezone: account                        # account | contact (the contact's own time zone)
+  stl:
+    enabled: true                            # speed to lead for new ad leads
+    lead_trigger: Facebook Lead Form Submitted (any page, any form)   # [checklist] how ad leads land in GHL
+    source_tag: src:fb-ad                    # tag for the lead's source
+    own_lead_pipeline: ""                    # the client's own lead pipeline; "" = build STL | Inbound Leads
+    own_lead_stage: ""                       # [checklist, if own pipeline] where new leads land, e.g. Lead
+    own_app_done_stage: ""                   # [checklist, if own pipeline] finished application, e.g. Application Received
+    own_replied_stage: ""                    # optional: move the deal here when the lead replies; "" = no move
+    quick_app_url: ""                        # [go-live] the short application or request form every message links to
+  react:
+    enabled: true                            # database reactivation
+    past_client_data: in GHL                 # [checklist] where past clients live (GHL, a CRM export, a spreadsheet)
+    drip_batch_size: 150                     # bulk-action drip: contacts a day per segment
+    drip_days: [tue, wed, thu]
+    segments:                                # one smart list + one workflow each; sequence its-me | check-in | aff-handoff
+      - num: "01"
+        name: Past Customers
+        sequence: its-me
+        rule: Anyone with a won job in the sales pipeline, won more than 90 days ago.
+      - num: "02"
+        name: Lost Estimates
+        sequence: its-me
+        rule: Got an estimate, did not book, no activity for 60+ days.
+      - num: "03"
+        name: Unfinished Requests
+        sequence: its-me
+        unfinished_app: true
+        rule: Started the estimate request but did not finish it, or tagged stl:no-response.
+      - num: "04"
+        name: Old Ad Leads
+        sequence: check-in
+        rule: Came from a Facebook or Instagram ad 90 to 365 days ago, not in 01-03.
+      - num: "05"
+        name: Referral Sources
+        sequence: aff-handoff
+        rule: Realtors, inspectors and other pros in the contacts. They get partner outreach instead.
+      - num: "06"
+        name: Long Tail
+        sequence: check-in
+        email_only: true
+        rule: Has an email, added over a year ago, no activity for a year, not in 01-05.
+  aff_email:
+    enabled: true                            # the partner email layer on the standard partner build
+    broker_intake_shell: false               # true = also the empty "AFF | Broker Intake" pipeline
+    referral_form_url: ""                    # "" = the Refer a Client page on the partner domain
+    partner_signup_url: ""                   # "" = the Become a Partner page on the partner domain
+    outreach:                                # one outreach workflow per list; tag aff:queue-<key> starts it
+      - key: realtor                         # copy: introducer (their clients become yours) | peer (they turn work away)
+        name: Realtors
+        copy: introducer
+        audience: realtors
+      - key: contractor
+        name: General Contractors
+        copy: peer
+        audience: general contractors
+  copy:                                      # [go-live] the words the DRAFT copy needs; the client approves the result
+    approved: false                          # [go-live] true once the client approved out/template-copy.md in writing
+    lead_topic: roof replacement             # "next step on your roof replacement"
+    customer_type: homeowners                # "the homeowners I've worked with"
+    customer_word: homeowner                 # "one homeowner"
+    offer_verb: do                           # "what we do"
+    offer_line: We replace and repair roofs for homeowners across the Front Range, and we pick up the phone.
+    app_line: the free estimate request takes about a minute     # starts lowercase; followed by ": <link>"
+    deal_word: project                       # "the project you're working on"
+
 customize:
   # Changes to the standard build for this client. Same name replaces; a new name adds.
   remove:

@@ -56,6 +56,24 @@ Each item says which stage it blocks:
 - [ ] A real form fill by a person, once, to close the tests (1 minute).
 - [ ] Rotate the Private Integration token at handover: the client deletes ours or makes a new one.
 
+## Only with the larry template (STL, REACT, partner emails)
+
+Skip this section unless `template.name: larry`. Copy approval always comes before anything sends.
+
+- [ ] **[build]** Who signs the emails and texts (full name), and a short prefix for our custom values (2-4 letters).
+- [ ] **[checklist]** Who gets reply and call tasks (the assistant) and who gets owner tasks and the new-lead text alert. Both users of the sub-account.
+- [ ] **[checklist]** Lead sources: how ad leads land in GHL today (Facebook lead-form integration, a website form, a webhook, another tool) and the form names.
+- [ ] **[checklist]** Their own lead pipeline, if any: its name, the stage new leads land at, and the stage for a finished application. Ask before building: we rebuilt speed to lead once when the leads moved.
+- [ ] **[go-live]** The short application or request link every message points to.
+- [ ] **[checklist]** Where past-client data lives (GHL, a CRM export, a spreadsheet), and which segments make sense for them (past customers, lost quotes, unfinished applications, old ad leads, referral sources, long-inactive).
+- [ ] **[go-live]** The owner's go before we tag or enroll any of their contacts.
+- [ ] **[checklist]** Partner lists for outreach, and for each: do their clients become yours (introducer), or do they turn away work you take (peer)?
+- [ ] **[go-live]** The sending domain for these emails, authenticated (SPF, DKIM, DMARC). Until then GHL's shared domain: fine for warm contacts, not for volume.
+- [ ] **[go-live]** A2P status. Texts stay off until it is approved; email goes first.
+- [ ] **[go-live]** A sending window for reactivation (default Mon-Fri, 9-5, their time zone).
+- [ ] **[go-live]** Written approval of every message in `out/template-copy.md`, and which program goes live first.
+- [ ] Cold partner lists: these never go into GHL by CSV import. Which tool and whose inboxes send them.
+
 ## Intake questions Claude can ask
 
 Ask a few at a time, starting with what blocks the build. Fill from the client's folder first.
@@ -76,3 +94,11 @@ Ask a few at a time, starting with what blocks the build. Fill from the client's
 14. Have you registered for business texting (A2P) in GHL? If not, can you start it this week?
 15. Which tool sends your cold email, and who owns the sending inboxes? If it is Instantly, can you share the workspace with us?
 16. Is anything already in your GHL that we must leave alone?
+
+With the larry template, also:
+
+17. Who signs your emails and texts? Who handles replies and calls, and who should get a text when a new lead comes in?
+18. How do your ad leads reach GHL today, and which pipeline do they land in?
+19. What is the link for your short application or request form?
+20. Where do your past clients live, and are there groups you would never contact?
+21. Which kinds of partners should we reach out to first?

@@ -1,0 +1,454 @@
+{
+  "_about": [
+    "Names only, read over the API (GET) from the source account of the larry template on 2026-10-17. No contact data, no values, no ids. Used by tests/template.test.js to check the template still matches the live build. See spec/10-larry-template.md."
+  ],
+  "readAt": "2026-10-17",
+  "timezone": "America/Los_Angeles",
+  "customValues": [
+    "cb_quick_app_url",
+    "cb_partner_signup_url",
+    "cb_partner_calendar_url",
+    "cb_referral_form_url",
+    "cb_larry_phone",
+    "cb_larry_email",
+    "cb_assistant_email",
+    "cb_what_changed",
+    "cb_partner_comp_line"
+  ],
+  "contactFields": [
+    {
+      "name": "aff_broker_type",
+      "dataType": "SINGLE_OPTIONS",
+      "options": [
+        "business-loan",
+        "mortgage",
+        "cre-lender"
+      ]
+    },
+    {
+      "name": "aff_category",
+      "dataType": "SINGLE_OPTIONS",
+      "options": [
+        "realtor",
+        "wholesaler",
+        "hard-money",
+        "mortgage-broker",
+        "title",
+        "attorney",
+        "contractor",
+        "property-manager",
+        "inspector-appraiser",
+        "cpa",
+        "insurance",
+        "cre-broker",
+        "business-broker",
+        "developer",
+        "financial-advisor",
+        "sba-banker",
+        "reia",
+        "coach",
+        "marketing-agency",
+        "other"
+      ]
+    },
+    {
+      "name": "aff_comp_model",
+      "dataType": "TEXT"
+    },
+    {
+      "name": "aff_has_list",
+      "dataType": "CHECKBOX",
+      "options": [
+        "Yes"
+      ]
+    },
+    {
+      "name": "aff_last_checkin_at",
+      "dataType": "DATE"
+    },
+    {
+      "name": "aff_partner_tier",
+      "dataType": "SINGLE_OPTIONS",
+      "options": [
+        "tier-1-referral",
+        "tier-2-broker"
+      ]
+    },
+    {
+      "name": "aff_referrals_count",
+      "dataType": "NUMERICAL"
+    },
+    {
+      "name": "aff_referred_by",
+      "dataType": "TEXT"
+    },
+    {
+      "name": "aff_signed_date",
+      "dataType": "DATE"
+    },
+    {
+      "name": "aff_status",
+      "dataType": "SINGLE_OPTIONS",
+      "options": [
+        "prospect",
+        "outreach-sent",
+        "replied",
+        "call-booked",
+        "signed",
+        "onboarded",
+        "active",
+        "dormant",
+        "declined"
+      ]
+    },
+    {
+      "name": "react_batch",
+      "dataType": "TEXT"
+    },
+    {
+      "name": "react_context",
+      "dataType": "TEXT"
+    },
+    {
+      "name": "react_last_touch_at",
+      "dataType": "DATE"
+    },
+    {
+      "name": "react_segment",
+      "dataType": "SINGLE_OPTIONS",
+      "options": [
+        "01-past-borrowers",
+        "02-dead-term-sheets",
+        "03-quick-app-abandon",
+        "04-old-ad-leads",
+        "05-referral-sources",
+        "06-long-tail"
+      ]
+    },
+    {
+      "name": "react_style",
+      "dataType": "SINGLE_OPTIONS",
+      "options": [
+        "check-in",
+        "its-larry",
+        "whats-changed"
+      ]
+    },
+    {
+      "name": "stl_first_touch_at",
+      "dataType": "DATE"
+    },
+    {
+      "name": "stl_status",
+      "dataType": "SINGLE_OPTIONS",
+      "options": [
+        "new",
+        "contacted",
+        "replied",
+        "no-response",
+        "quick-app-complete",
+        "handoff"
+      ]
+    }
+  ],
+  "tags": [
+    "aff:active",
+    "aff:broker-business-loan",
+    "aff:broker-cre",
+    "aff:broker-mortgage",
+    "aff:call-booked",
+    "aff:declined",
+    "aff:dormant",
+    "aff:has-list",
+    "aff:no-show",
+    "aff:onboarded",
+    "aff:outreach-sent",
+    "aff:prospect",
+    "aff:queue-bizloan",
+    "aff:queue-cre",
+    "aff:queue-mortgage",
+    "aff:queue-tier1",
+    "aff:referred-lead",
+    "aff:replied",
+    "aff:signed",
+    "aff:tier-1-referral",
+    "aff:tier-2-broker",
+    "react:do-not-contact",
+    "react:excluded",
+    "react:interested",
+    "react:not-now",
+    "react:queued",
+    "react:replied",
+    "react:segment-01",
+    "react:segment-02",
+    "react:segment-03",
+    "react:segment-04",
+    "react:segment-05",
+    "react:segment-06",
+    "react:sent",
+    "src:fb-ad",
+    "src:ig-ad",
+    "src:import-2026-09",
+    "src:instantly",
+    "src:linkedin",
+    "src:partner-referral",
+    "src:quick-app",
+    "src:website-form",
+    "stl:contacted",
+    "stl:handoff-larry",
+    "stl:new",
+    "stl:no-response",
+    "stl:quick-app-complete",
+    "stl:replied"
+  ],
+  "pipelines": [
+    {
+      "name": "ClearBlu Home & Commercial Lending Leads",
+      "stages": [
+        "Lead",
+        "No Response",
+        "Interview",
+        "Cash Challenged",
+        "Credit Challenged",
+        "Collateral / Property Search",
+        "Developer Experience Challenge",
+        "Outside Funding Parameters - Refer",
+        "Application Received",
+        "Preapproval",
+        "Appraisal Ordered",
+        "Loan In Process",
+        "Appraisal Completed / Final Underwrite",
+        "Scheduled for Closing",
+        "Loan Closed"
+      ]
+    },
+    {
+      "name": "AFF | Partner Pipeline",
+      "stages": [
+        "New Prospect",
+        "Outreach Sent",
+        "Replied",
+        "Call Booked",
+        "Signed",
+        "Onboarded",
+        "Active",
+        "Dormant",
+        "Declined"
+      ]
+    },
+    {
+      "name": "STL | Inbound Leads",
+      "stages": [
+        "New Lead",
+        "Contacted",
+        "Engaged",
+        "Quick App Complete",
+        "Handed to Larry",
+        "No Response / Not a Fit"
+      ]
+    },
+    {
+      "name": "AFF | Broker Intake",
+      "stages": [
+        "Application Received",
+        "Reviewing",
+        "Needs More",
+        "Approved",
+        "Active"
+      ]
+    }
+  ],
+  "partnerCalendar": {
+    "name": "AFF | Partner Intro Call – 20 min",
+    "slotDuration": 30,
+    "slotBuffer": 10,
+    "appointmentPerDay": 4,
+    "allowBookingAfter": 2,
+    "allowBookingFor": 30,
+    "openHours": [
+      {
+        "daysOfTheWeek": [
+          2
+        ],
+        "hours": [
+          {
+            "openHour": 9,
+            "openMinute": 30,
+            "closeHour": 10,
+            "closeMinute": 0
+          }
+        ]
+      },
+      {
+        "daysOfTheWeek": [
+          3
+        ],
+        "hours": [
+          {
+            "openHour": 10,
+            "openMinute": 30,
+            "closeHour": 11,
+            "closeMinute": 0
+          }
+        ]
+      },
+      {
+        "daysOfTheWeek": [
+          4
+        ],
+        "hours": [
+          {
+            "openHour": 9,
+            "openMinute": 30,
+            "closeHour": 10,
+            "closeMinute": 0
+          }
+        ]
+      }
+    ],
+    "formSubmitThanksMessageIsGhlDefault": true
+  },
+  "workflows": [
+    {
+      "name": "AFF | Call Booked",
+      "status": "published",
+      "version": 4
+    },
+    {
+      "name": "AFF | Call No-Show",
+      "status": "published",
+      "version": 3
+    },
+    {
+      "name": "AFF | Outreach – Tier 1 Referral",
+      "status": "published",
+      "version": 3
+    },
+    {
+      "name": "AFF | Outreach – Tier 2a Business-Loan Broker",
+      "status": "published",
+      "version": 3
+    },
+    {
+      "name": "AFF | Outreach – Tier 2b Mortgage Broker",
+      "status": "published",
+      "version": 3
+    },
+    {
+      "name": "AFF | Outreach – Tier 2c CRE Lender",
+      "status": "published",
+      "version": 3
+    },
+    {
+      "name": "AFF | Partner – Signed Up",
+      "status": "published",
+      "version": 5
+    },
+    {
+      "name": "AFF | Partner Check-In – 30/60",
+      "status": "published",
+      "version": 3
+    },
+    {
+      "name": "AFF | Partner Nurture – Every Other Day",
+      "status": "published",
+      "version": 3
+    },
+    {
+      "name": "AFF | Referral Received",
+      "status": "published",
+      "version": 4
+    },
+    {
+      "name": "AFF | Reply Router",
+      "status": "published",
+      "version": 4
+    },
+    {
+      "name": "REACT | Re-entry – Check-in",
+      "status": "draft",
+      "version": 4
+    },
+    {
+      "name": "REACT | Reply Router",
+      "status": "published",
+      "version": 6
+    },
+    {
+      "name": "REACT | Segment 01 – Past Borrowers",
+      "status": "draft",
+      "version": 10
+    },
+    {
+      "name": "REACT | Segment 02 – Dead Term Sheets",
+      "status": "draft",
+      "version": 6
+    },
+    {
+      "name": "REACT | Segment 03 – Quick App Abandon",
+      "status": "draft",
+      "version": 7
+    },
+    {
+      "name": "REACT | Segment 04 – Old Ad Leads",
+      "status": "draft",
+      "version": 7
+    },
+    {
+      "name": "REACT | Segment 06 – Long Tail",
+      "status": "draft",
+      "version": 7
+    },
+    {
+      "name": "STL | FB Lead – Follow-Up Ladder",
+      "status": "published",
+      "version": 6
+    },
+    {
+      "name": "STL | FB Lead – Instant Response",
+      "status": "published",
+      "version": 6
+    },
+    {
+      "name": "STL | Inbound Reply Router",
+      "status": "published",
+      "version": 4
+    }
+  ],
+  "emailTemplates": [
+    "AFF - Signed Up - AFF Welcome",
+    "AFF - Nurture - Email 1 · Day 0",
+    "AFF - Nurture - Email 2 · Day 2",
+    "AFF - Nurture - Email 3 · Day 4",
+    "AFF - Nurture - Email 4 · Day 6",
+    "AFF - Nurture - Email 5 · Day 8",
+    "AFF - Nurture - Email 6 · Day 10",
+    "AFF - Nurture - Email 7 · Day 12",
+    "AFF - Nurture - Email 8 · Day 14",
+    "AFF - Outreach Tier 2b Mortgage Broker - Email 1",
+    "AFF - Outreach Tier 2b Mortgage Broker - Email 2",
+    "AFF - Outreach Tier 2b Mortgage Broker - Email 3",
+    "AFF - Outreach Tier 2b Mortgage Broker - Email 4",
+    "AFF - Outreach Tier 1 Referral - Email 1",
+    "AFF - Outreach Tier 1 Referral - Email 2",
+    "AFF - Outreach Tier 1 Referral - Email 3",
+    "AFF - Outreach Tier 1 Referral - Email 4",
+    "AFF - Outreach Tier 2a Business-Loan Broker - Email 1",
+    "AFF - Outreach Tier 2a Business-Loan Broker - Email 2",
+    "AFF - Outreach Tier 2a Business-Loan Broker - Email 3",
+    "AFF - Outreach Tier 2a Business-Loan Broker - Email 4",
+    "AFF - Outreach Tier 2c CRE Lender - Email 1",
+    "AFF - Outreach Tier 2c CRE Lender - Email 2",
+    "AFF - Outreach Tier 2c CRE Lender - Email 3",
+    "AFF - Outreach Tier 2c CRE Lender - Email 4",
+    "AFF - Call Booked - Confirmation",
+    "AFF - Call Booked - No-show re-offer",
+    "AFF - Referral Received - \"Got your referral, thank you\"",
+    "AFF - Check-In - Day 30",
+    "AFF - Check-In - Day 60"
+  ],
+  "forms": [
+    "AFF | Referral Submission",
+    "AFF | Partner Sign-Up"
+  ]
+}

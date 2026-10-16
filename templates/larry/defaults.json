@@ -1,0 +1,33 @@
+{
+  "_about": [
+    "Defaults for the larry template: what it builds when client.yaml leaves a template input out.",
+    "With every input left out, the template rebuilds the source build's structure (segments, outreach lists, pipeline, windows). Source: spec/10-larry-template.md.",
+    "Nothing here names the source client, its people or its products. Segment and outreach names are the source build's; a client changes them in client.yaml (template.react.segments, template.aff_email.outreach)."
+  ],
+  "about": "Speed to lead (STL), database reactivation (REACT) and the partner email layer (AFF), copied from our first lender build.",
+  "stl_pipeline": {
+    "name": "STL | Inbound Leads",
+    "new_stage": "New Lead",
+    "app_done_stage": "Quick App Complete",
+    "replied_stage": "Engaged"
+  },
+  "stl_lead_trigger": "Facebook Lead Form Submitted (any page, any form)",
+  "stl_source_tag": "src:fb-ad",
+  "stl_window": "every day, 8 AM to 8 PM in the contact's time zone",
+  "sending_window": { "days": ["mon", "tue", "wed", "thu", "fri"], "start": "09:00", "end": "17:00" },
+  "drip": { "batch_size": 150, "days": ["tue", "wed", "thu"], "window": "9:00 to 11:00" },
+  "segments": [
+    { "num": "01", "key": "past-borrowers", "name": "Past Borrowers", "sequence": "its-me", "rule": "Anyone with a won deal in the client's main sales pipeline (or at its last, closed stage), won more than 90 days ago." },
+    { "num": "02", "key": "dead-term-sheets", "name": "Dead Term Sheets", "sequence": "its-me", "rule": "Not won, and reached the quote or offer stage (or later), then was lost, abandoned, or has not moved in 60+ days." },
+    { "num": "03", "key": "quick-app-abandon", "name": "Quick App Abandon", "sequence": "its-me", "unfinished_app": true, "rule": "Started the short application but did not finish it, or tagged stl:no-response by the STL ladder." },
+    { "num": "04", "key": "old-ad-leads", "name": "Old Ad Leads", "sequence": "check-in", "rule": "Came from a Facebook or Instagram ad (source, attribution or an ad-lead tag), added 90 to 365 days ago, and not in 01-03." },
+    { "num": "05", "key": "referral-sources", "name": "Referral Sources", "sequence": "aff-handoff", "rule": "Contacts who refer business rather than buy (agents, brokers, other professionals), by tag or by a 'broker' answer on a form. They get partner outreach, not reactivation." },
+    { "num": "06", "key": "long-tail", "name": "Long Tail", "sequence": "check-in", "email_only": true, "rule": "Has an email, added more than 365 days ago, no activity for 365+ days, and not in 01-05." }
+  ],
+  "outreach": [
+    { "key": "tier1", "name": "Tier 1 Referral", "copy": "introducer", "audience": "professionals whose clients become your customers" },
+    { "key": "bizloan", "name": "Tier 2a Business-Loan Broker", "copy": "peer", "audience": "business-loan brokers" },
+    { "key": "mortgage", "name": "Tier 2b Mortgage Broker", "copy": "peer", "audience": "mortgage brokers and loan officers" },
+    { "key": "cre", "name": "Tier 2c CRE Lender", "copy": "peer", "audience": "commercial lenders" }
+  ]
+}
